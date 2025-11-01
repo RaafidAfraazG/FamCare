@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent Dashboard - FamCare</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏥 FamCare</h1>
+            <div class="nav-links">
+                <span>Welcome, Parent!</span>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard">
+            <h1>Parent Dashboard 👨‍👩‍👧</h1>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Your Children</h3>
+                    <p class="mood-score" th:text="${childCount}"></p>
+                    <small>Connected accounts</small>
+                </div>
+            </div>
+
+            <!-- Children List -->
+            <div class="section">
+                <h2>Your Children's Wellness</h2>
+
+                <div th:if="${children != null and children.size() > 0}">
+                    <div th:each="child : ${children}" class="child-card">
+                        <div class="child-header">
+                            <h3 th:text="${child.fullName}"></h3>
+                            <small th:text="'@' + ${child.username}"></small>
+                        </div>
+
+                        <div class="child-info">
+                            <p>Email: <span th:text="${child.email}"></span></p>
+                        </div>
+
+                        <div class="child-actions">
+                            <a th:href="@{/parent/child/{id}/analytics(id=${child.id})}" class="btn-primary">View Analytics</a>
+                            <a th:href="@{/parent/child/{id}/mood-chart(id=${child.id})}" class="btn-secondary">View Mood Chart</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:unless="${children != null and children.size() > 0}">
+                    <p class="no-data">No children connected yet. Have them create an account with your ID!</p>
+                </div>
+            </div>
+
+            <!-- Information Section -->
+            <div class="section info-section">
+                <h2>How It Works</h2>
+                <ul>
+                    <li>✅ Your children log their daily mood and write private journal entries</li>
+                    <li>✅ You can view their mood trends and shared journal entries</li>
+                    <li>✅ Private entries remain completely private - only they can see</li>
+                    <li>✅ Use insights to have meaningful conversations about their wellness</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

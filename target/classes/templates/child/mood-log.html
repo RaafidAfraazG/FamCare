@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Mood - FamCare</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏥 FamCare</h1>
+            <div class="nav-links">
+                <span>Welcome, Child!</span>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-box">
+            <h2>Log Your Mood 📊</h2>
+
+            <!-- Error message -->
+            <div th:if="${error}" class="alert alert-error">
+                <p th:text="${error}"></p>
+            </div>
+
+            <!-- Success message -->
+            <div th:if="${success}" class="alert alert-success">
+                <p th:text="${success}"></p>
+            </div>
+
+            <form method="POST" th:action="@{/child/mood-log}" class="form">
+                <div class="form-group">
+                    <label for="moodScore">How are you feeling? (1-10)</label>
+                    <input type="range" id="moodScore" name="moodScore" min="1" max="10" value="5" 
+                           onchange="updateMoodLabel(this.value)" required>
+                    <p id="moodDisplay" class="mood-display">5 - Neutral 😐</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="moodLabel">Mood Label:</label>
+                    <select id="moodLabel" name="moodLabel" required>
+                        <option value="">Select a mood...</option>
+                        <option value="happy">Happy 😊</option>
+                        <option value="sad">Sad 😢</option>
+                        <option value="anxious">Anxious 😰</option>
+                        <option value="calm">Calm 😌</option>
+                        <option value="angry">Angry 😠</option>
+                        <option value="excited">Excited 🤩</option>
+                        <option value="tired">Tired 😴</option>
+                        <option value="confused">Confused 😕</option>
+                        <option value="neutral">Neutral 😐</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Additional Notes (optional):</label>
+                    <textarea id="notes" name="notes" rows="5" placeholder="Write anything about your day or how you're feeling..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary btn-block">Log Mood</button>
+            </form>
+
+            <div class="form-footer">
+                <a href="/child/dashboard">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateMoodLabel(value) {
+            const labels = {
+                1: '1 - Very Bad 😢',
+                2: '2 - Bad 😞',
+                3: '3 - Sad 😢',
+                4: '4 - Down 😕',
+                5: '5 - Neutral 😐',
+                6: '6 - Good 🙂',
+                7: '7 - Very Good 😊',
+                8: '8 - Happy 😄',
+                9: '9 - Very Happy 😄',
+                10: '10 - Excellent 🤩'
+            };
+            document.getElementById('moodDisplay').textContent = labels[value] || value;
+        }
+    </script>
+</body>
+</html>
