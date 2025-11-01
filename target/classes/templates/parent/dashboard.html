@@ -12,6 +12,7 @@
             <h1 class="logo">🏥 FamCare</h1>
             <div class="nav-links">
                 <span>Welcome, Parent!</span>
+                <a href="/family/dashboard">👨‍👩‍👧 Family Wellness</a>
                 <a href="/logout">Logout</a>
             </div>
         </div>
@@ -20,6 +21,17 @@
     <div class="container">
         <div class="dashboard">
             <h1>Parent Dashboard 👨‍👩‍👧</h1>
+
+            <!-- Family Wellness Quick Access -->
+            <div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-left: none;">
+                <h2 style="color: white; margin-top: 0;">👨‍👩‍👧 Family Wellness Center</h2>
+                <p>View family-wide insights, mood trends, and intervention alerts for all members.</p>
+                <div class="action-buttons" style="margin-top: 15px;">
+                    <a href="/family/dashboard" class="btn-primary" style="background: white; color: #667eea;">📊 Go to Family Dashboard</a>
+                    <a href="/family/alerts" class="btn-primary" style="background: #ff6b6b;">🔔 View Alerts</a>
+                    <a href="/family/insights" class="btn-primary" style="background: #4ecdc4;">💡 View Insights</a>
+                </div>
+            </div>
 
             <!-- Stats -->
             <div class="stats-grid">
@@ -62,7 +74,8 @@
                 <h2>How It Works</h2>
                 <ul>
                     <li>✅ Your children log their daily mood and write private journal entries</li>
-                    <li>✅ You can view their mood trends and shared journal entries</li>
+                    <li>✅ You can view individual mood trends and shared journal entries</li>
+                    <li>✅ Access family-wide insights and intervention alerts</li>
                     <li>✅ Private entries remain completely private - only they can see</li>
                     <li>✅ Use insights to have meaningful conversations about their wellness</li>
                 </ul>
