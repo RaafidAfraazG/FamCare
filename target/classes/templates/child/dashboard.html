@@ -4,8 +4,309 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Dashboard - FamCare</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: #fdfefe;
+            color: #1a1a1a;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark-theme {
+            background: linear-gradient(135deg, #1a1c2e 0%, #2a1a3d 100%);
+            color: #e2e8f0;
+        }
+
+        /* Background Animation */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .gradient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.18;
+            animation: float-elegant 25s infinite ease-in-out;
+            transition: opacity 0.3s ease;
+        }
+
+        body.dark-theme .gradient-orb {
+            filter: blur(100px);
+            opacity: 0.15;
+        }
+
+        .orb1 {
+            width: 450px;
+            height: 450px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            top: -8%;
+            left: -8%;
+            animation-delay: 0s;
+        }
+
+        body.dark-theme .orb1 {
+            background: radial-gradient(circle at center, #6366f1 0%, #8b5cf6 100%);
+        }
+
+        .orb2 {
+            width: 350px;
+            height: 350px;
+            background: linear-gradient(135deg, #ec4899 0%, #f97316 100%);
+            bottom: -4%;
+            right: -4%;
+            animation-delay: 8s;
+        }
+
+        body.dark-theme .orb2 {
+            background: radial-gradient(circle at center, #ec4899 0%, #f97316 100%);
+        }
+
+        .orb3 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: 4s;
+        }
+
+        body.dark-theme .orb3 {
+            background: radial-gradient(circle at center, #06b6d4 0%, #3b82f6 100%);
+        }
+
+        @keyframes float-elegant {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.18;
+            }
+            33% {
+                transform: translate(40px, -40px) scale(1.08);
+                opacity: 0.22;
+            }
+            66% {
+                transform: translate(-25px, 25px) scale(0.92);
+                opacity: 0.14;
+            }
+        }
+
+        body.dark-theme .orb1,
+        body.dark-theme .orb2,
+        body.dark-theme .orb3 {
+            animation: float-elegant-dark 25s infinite ease-in-out;
+        }
+
+        @keyframes float-elegant-dark {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.15;
+            }
+            33% {
+                transform: translate(40px, -40px) scale(1.08);
+                opacity: 0.2;
+            }
+            66% {
+                transform: translate(-25px, 25px) scale(0.92);
+                opacity: 0.12;
+            }
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(99, 102, 241, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.025) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: grid-move 20s linear infinite;
+            transition: background-image 0.3s ease;
+        }
+
+        body.dark-theme .bg-animation::before {
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        }
+
+        @keyframes grid-move {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 16px 0;
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.07);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(20px) saturate(180%);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body.dark-theme .navbar {
+            background: rgba(30, 32, 52, 0.9);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .navbar .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .logo {
+            color: #f1f5f9;
+        }
+
+        .logo-icon {
+            font-size: 26px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links span {
+            color: #64748b;
+            font-weight: 500;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .nav-links span {
+            color: #cbd5e1;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        body.dark-theme .nav-links a {
+            color: #cbd5e1;
+        }
+
+        .nav-links a:not(.btn-logout):hover {
+            color: #1a1a1a;
+        }
+
+        body.dark-theme .nav-links a:not(.btn-logout):hover {
+            color: #ffffff;
+        }
+
+        .btn-logout {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white !important;
+            padding: 9px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 3px 10px rgba(239, 68, 68, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 16px rgba(239, 68, 68, 0.35);
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1.5px solid rgba(99, 102, 241, 0.2);
+            color: #6366f1;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(99, 102, 241, 0.15);
+            transform: translateY(-2px);
+        }
+
+        body.dark-theme .theme-toggle {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+            color: #a5b4fc;
+        }
+
+        body.dark-theme .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Container */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 40px 40px;
+        }
+
+        /* Dashboard */
+        .dashboard h1 {
+            font-size: 42px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            letter-spacing: -1.5px;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .dashboard h1 {
+            color: #f9fafb;
+        }
+
+        /* Chat Banner */
         .chat-banner {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -16,11 +317,22 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .chat-banner:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.4);
+        }
+
+        body.dark-theme .chat-banner {
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.2);
         }
 
         .chat-banner-content h2 {
             margin: 0 0 8px 0;
             font-size: 24px;
+            font-weight: 700;
         }
 
         .chat-banner-content p {
@@ -42,6 +354,7 @@
             transition: all 0.3s ease;
             white-space: nowrap;
             margin-left: 20px;
+            display: inline-block;
         }
 
         .chat-banner-button:hover {
@@ -49,7 +362,355 @@
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
 
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 18px;
+            margin: 30px 0 40px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            padding: 28px 24px;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark-theme .stat-card {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .stat-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+            border-color: rgba(99, 102, 241, 0.15);
+        }
+
+        body.dark-theme .stat-card:hover {
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .stat-card:nth-child(1) {
+            --accent-color: #6366f1;
+        }
+
+        .stat-card:nth-child(2) {
+            --accent-color: #ec4899;
+        }
+
+        .stat-card:nth-child(3) {
+            --accent-color: #06b6d4;
+        }
+
+        .stat-card:nth-child(4) {
+            --accent-color: #d946ef;
+        }
+
+        .stat-card h3 {
+            font-size: 15px;
+            margin-bottom: 14px;
+            color: #64748b;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            text-transform: uppercase;
+            font-size: 12px;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .stat-card h3 {
+            color: #94a3b8;
+        }
+
+        .mood-score {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+            letter-spacing: -1px;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .mood-score {
+            color: #f1f5f9;
+        }
+
+        .stat-card p:not(.mood-score) {
+            color: #64748b;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .stat-card p:not(.mood-score) {
+            color: #cbd5e1;
+        }
+
+        .stat-card small {
+            color: #94a3b8;
+            font-size: 13px;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .stat-card small {
+            color: #94a3b8;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 14px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary, .btn-secondary {
+            padding: 14px 36px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            letter-spacing: -0.2px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.25);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(99, 102, 241, 0.35);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #6366f1;
+            border: 1.5px solid #d1d5db;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        body.dark-theme .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: #a5b4fc;
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-secondary:hover {
+            background: #f3f4f6;
+            border-color: #6366f1;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        body.dark-theme .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+        }
+
+        /* Section */
+        .section {
+            margin-top: 50px;
+        }
+
+        .section h2 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 24px;
+            letter-spacing: -0.8px;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .section h2 {
+            color: #f1f5f9;
+        }
+
+        /* Table */
+        .table {
+            width: 100%;
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-theme .table {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .table thead {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        }
+
+        .table thead th {
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: white;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .table tbody tr {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: background 0.2s ease;
+        }
+
+        body.dark-theme .table tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .table tbody tr:hover {
+            background: rgba(99, 102, 241, 0.03);
+        }
+
+        body.dark-theme .table tbody tr:hover {
+            background: rgba(99, 102, 241, 0.08);
+        }
+
+        .table tbody td {
+            padding: 16px 20px;
+            color: #1a1a1a;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .table tbody td {
+            color: #e2e8f0;
+        }
+
+        .section p {
+            color: #64748b;
+            font-size: 15px;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .section p {
+            color: #cbd5e1;
+        }
+
+        .section a {
+            color: #6366f1;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .section a {
+            color: #a5b4fc;
+        }
+
+        .section a:hover {
+            color: #4f46e5;
+            text-decoration: underline;
+        }
+
+        body.dark-theme .section a:hover {
+            color: #ffffff;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
+            .dashboard h1 {
+                font-size: 32px;
+                letter-spacing: -1px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                text-align: center;
+            }
+
+            .container {
+                padding: 30px 24px;
+            }
+
+            .navbar .container {
+                padding: 0 24px;
+            }
+
+            .nav-links {
+                gap: 12px;
+            }
+
+            .nav-links span {
+                display: none;
+            }
+
+            .table {
+                font-size: 13px;
+            }
+
+            .table thead th,
+            .table tbody td {
+                padding: 12px 14px;
+            }
+
+            .section h2 {
+                font-size: 22px;
+            }
+
             .chat-banner {
                 flex-direction: column;
                 align-items: flex-start;
@@ -62,15 +723,32 @@
                 text-align: center;
             }
         }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
     </style>
 </head>
 <body>
+    <div class="bg-animation">
+        <div class="gradient-orb orb1"></div>
+        <div class="gradient-orb orb2"></div>
+        <div class="gradient-orb orb3"></div>
+    </div>
+
     <nav class="navbar">
         <div class="container">
-            <h1 class="logo">🏥 FamCare</h1>
+            <h1 class="logo">
+                <span class="logo-icon">🏥</span>
+                <span>FamCare</span>
+            </h1>
             <div class="nav-links">
                 <span>Welcome, Child!</span>
-                <a href="/logout">Logout</a>
+                <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">
+                    <span id="themeIcon">🌙</span>
+                </button>
+                <a href="/logout" class="btn-logout">Logout</a>
             </div>
         </div>
     </nav>
@@ -93,8 +771,8 @@
                 <div class="stat-card">
                     <h3>Today's Mood</h3>
                     <div th:if="${latestMood != null}">
-                        <p class="mood-score" th:text="${latestMood.moodScore} + '/10'"></p>
-                        <p th:text="${moodCategory}"></p>
+                        <p class="mood-score" th:text="${latestMood.moodScore} + '/10'">8/10</p>
+                        <p th:text="${moodCategory}">Good Mood</p>
                     </div>
                     <div th:unless="${latestMood != null}">
                         <p>No mood logged yet</p>
@@ -103,20 +781,20 @@
 
                 <div class="stat-card">
                     <h3>Weekly Average</h3>
-                    <p class="mood-score" th:text="${weeklyAverage != null ? #numbers.formatDecimal(weeklyAverage, 1, 1) : '0'}"></p>
+                    <p class="mood-score" th:text="${weeklyAverage != null ? #numbers.formatDecimal(weeklyAverage, 1, 1) : '0'}">7.5</p>
                     <small>Last 7 days</small>
                 </div>
 
                 <div class="stat-card">
                     <h3>Mood Logs</h3>
-                    <p class="mood-score" th:text="${moodCount}"></p>
+                    <p class="mood-score" th:text="${moodCount}">42</p>
                     <small>Total entries</small>
                 </div>
 
                 <div class="stat-card">
                     <h3>Journal Entries</h3>
-                    <p class="mood-score" th:text="${journalCount}"></p>
-                    <small th:text="${privateJournalCount} + ' private'"></small>
+                    <p class="mood-score" th:text="${journalCount}">18</p>
+                    <small th:text="${privateJournalCount} + ' private'">12 private</small>
                 </div>
             </div>
 
@@ -142,10 +820,10 @@
                         </thead>
                         <tbody>
                             <tr th:each="mood : ${recentMoods}">
-                                <td th:text="${mood.createdAt}"></td>
-                                <td th:text="${mood.moodScore} + '/10'"></td>
-                                <td th:text="${mood.moodLabel}"></td>
-                                <td th:text="${mood.notes != null ? mood.notes : '—'}"></td>
+                                <td th:text="${mood.createdAt}">2025-11-02</td>
+                                <td th:text="${mood.moodScore} + '/10'">8/10</td>
+                                <td th:text="${mood.moodLabel}">Happy</td>
+                                <td th:text="${mood.notes != null ? mood.notes : '—'}">Had a great day!</td>
                             </tr>
                         </tbody>
                     </table>
@@ -156,5 +834,29 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+            document.getElementById('themeIcon').textContent = '☀️';
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            
+            body.classList.toggle('dark-theme');
+            
+            if (body.classList.contains('dark-theme')) {
+                themeIcon.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeIcon.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+    </script>
 </body>
 </html>

@@ -4,18 +4,650 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - FamCare</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: #fdfefe;
+            color: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark-theme {
+            background: linear-gradient(135deg, #1a1c2e 0%, #2a1a3d 100%);
+            color: #e2e8f0;
+        }
+
+        /* Elegant Background Animation */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .gradient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.18;
+            animation: float-elegant 25s infinite ease-in-out;
+            transition: opacity 0.3s ease;
+        }
+
+        body.dark-theme .gradient-orb {
+            filter: blur(100px);
+            opacity: 0.15;
+        }
+
+        .orb1 {
+            width: 450px;
+            height: 450px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            top: -8%;
+            left: -8%;
+            animation-delay: 0s;
+        }
+
+        body.dark-theme .orb1 {
+            background: radial-gradient(circle at center, #6366f1 0%, #8b5cf6 100%);
+        }
+
+        .orb2 {
+            width: 350px;
+            height: 350px;
+            background: linear-gradient(135deg, #ec4899 0%, #f97316 100%);
+            bottom: -4%;
+            right: -4%;
+            animation-delay: 8s;
+        }
+
+        body.dark-theme .orb2 {
+            background: radial-gradient(circle at center, #ec4899 0%, #f97316 100%);
+        }
+
+        .orb3 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: 4s;
+        }
+
+        body.dark-theme .orb3 {
+            background: radial-gradient(circle at center, #06b6d4 0%, #3b82f6 100%);
+        }
+
+        @keyframes float-elegant {
+            0%, 100% { 
+                transform: translate(0, 0) scale(1);
+                opacity: 0.18;
+            }
+            33% { 
+                transform: translate(40px, -40px) scale(1.08);
+                opacity: 0.22;
+            }
+            66% { 
+                transform: translate(-25px, 25px) scale(0.92);
+                opacity: 0.14;
+            }
+        }
+
+        body.dark-theme .orb1,
+        body.dark-theme .orb2,
+        body.dark-theme .orb3 {
+            animation: float-elegant-dark 25s infinite ease-in-out;
+        }
+
+        @keyframes float-elegant-dark {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.15;
+            }
+            33% {
+                transform: translate(40px, -40px) scale(1.08);
+                opacity: 0.2;
+            }
+            66% {
+                transform: translate(-25px, 25px) scale(0.92);
+                opacity: 0.12;
+            }
+        }
+
+        /* Subtle Grid Pattern */
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(99, 102, 241, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.025) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: grid-move 20s linear infinite;
+            transition: background-image 0.3s ease;
+        }
+
+        body.dark-theme .bg-animation::before {
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        }
+
+        @keyframes grid-move {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 16px 0;
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.07);
+            position: relative;
+            z-index: 100;
+            backdrop-filter: blur(20px) saturate(180%);
+            animation: slideDown 0.6s ease-out;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body.dark-theme .navbar {
+            background: rgba(30, 32, 52, 0.9);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .navbar .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .logo {
+            color: #f1f5f9;
+        }
+
+        .logo-icon {
+            font-size: 26px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        body.dark-theme .nav-links a {
+            color: #cbd5e1;
+        }
+
+        .nav-links a:hover {
+            color: #1a1a1a;
+        }
+
+        body.dark-theme .nav-links a:hover {
+            color: #ffffff;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1.5px solid rgba(99, 102, 241, 0.2);
+            color: #6366f1;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(99, 102, 241, 0.15);
+            transform: translateY(-2px);
+        }
+
+        body.dark-theme .theme-toggle {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+            color: #a5b4fc;
+        }
+
+        body.dark-theme .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Main Container */
+        .container {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        /* Login Box */
+        .auth-box {
+            background: #ffffff;
+            padding: 40px 36px;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            width: 100%;
+            max-width: 420px;
+            animation: zoomIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            transition: background 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body.dark-theme .auth-box {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .auth-box h2 {
+            text-align: center;
+            color: #1a1a1a;
+            margin-bottom: 28px;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            animation: fadeInDown 0.8s ease-out;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .auth-box h2 {
+            color: #f1f5f9;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            animation: slideInRight 0.5s ease-out;
+            border-left: 3px solid;
+            font-size: 13px;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .alert-error {
+            background: #fee;
+            color: #c33;
+            border-color: #c33;
+        }
+
+        body.dark-theme .alert-error {
+            background: rgba(220, 38, 38, 0.15);
+            color: #fca5a5;
+            border-color: #ef4444;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-color: #28a745;
+        }
+
+        body.dark-theme .alert-success {
+            background: rgba(34, 197, 94, 0.15);
+            color: #86efac;
+            border-color: #22c55e;
+        }
+
+        /* Form */
+        .form {
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        body.dark-theme .form-group label {
+            color: #cbd5e1;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+            color: #1a1a1a;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body.dark-theme .form-group input {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #6366f1;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        body.dark-theme .form-group input:focus {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .form-group input::placeholder {
+            color: #94a3b8;
+        }
+
+        body.dark-theme .form-group input::placeholder {
+            color: #64748b;
+        }
+
+        /* Password Toggle */
+        .password-toggle {
+            position: relative;
+        }
+
+        .password-toggle input {
+            padding-right: 42px;
+        }
+
+        .toggle-icon {
+            position: absolute;
+            right: 12px;
+            top: 38px;
+            cursor: pointer;
+            font-size: 18px;
+            user-select: none;
+            transition: all 0.3s;
+            opacity: 0.6;
+        }
+
+        .toggle-icon:hover {
+            transform: scale(1.1);
+            opacity: 1;
+        }
+
+        /* Button */
+        .btn-primary {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+            margin-top: 6px;
+            letter-spacing: -0.2px;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0px);
+        }
+
+        .btn-primary.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        /* Footer */
+        .auth-footer {
+            text-align: center;
+            margin-top: 24px;
+            animation: fadeIn 1.2s ease-out;
+        }
+
+        .auth-footer p {
+            color: #64748b;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .auth-footer p {
+            color: #94a3b8;
+        }
+
+        .auth-footer a {
+            color: #6366f1;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        body.dark-theme .auth-footer a {
+            color: #a5b4fc;
+        }
+
+        .auth-footer a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #6366f1;
+            transition: width 0.3s;
+        }
+
+        .auth-footer a:hover::after {
+            width: 100%;
+        }
+
+        .auth-footer a:hover {
+            color: #8b5cf6;
+        }
+
+        body.dark-theme .auth-footer a:hover {
+            color: #ffffff;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .auth-box {
+                padding: 32px 28px;
+                margin: 20px;
+                max-width: 380px;
+            }
+
+            .auth-box h2 {
+                font-size: 24px;
+            }
+
+            .form-group input {
+                padding: 11px 13px;
+            }
+
+            .btn-primary {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .navbar .container {
+                padding: 0 24px;
+            }
+
+            .nav-links {
+                gap: 12px;
+            }
+
+            .theme-toggle {
+                padding: 8px 10px;
+                font-size: 16px;
+            }
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
 </head>
 <body>
+    <!-- Elegant Background Animation -->
+    <div class="bg-animation">
+        <div class="gradient-orb orb1"></div>
+        <div class="gradient-orb orb2"></div>
+        <div class="gradient-orb orb3"></div>
+    </div>
+
+    <!-- Navbar -->
     <nav class="navbar">
         <div class="container">
-            <h1 class="logo">🏥 FamCare</h1>
+            <h1 class="logo">
+                <span class="logo-icon">🏥</span>
+                <span>FamCare</span>
+            </h1>
             <div class="nav-links">
                 <a href="/">Home</a>
+                <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">
+                    <span id="themeIcon">🌙</span>
+                </button>
             </div>
         </div>
     </nav>
 
+    <!-- Login Container -->
     <div class="container">
         <div class="auth-box">
             <h2>Login to FamCare</h2>
@@ -31,18 +663,23 @@
             </div>
 
             <!-- Login Form -->
-            <form method="POST" th:action="@{/login}" class="form">
+            <form method="POST" th:action="@{/login}" class="form" id="loginForm">
                 <div class="form-group">
-                    <label for="username">Username:</label>
-                    <input type="text" id="username" name="username" required placeholder="Enter your username">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required 
+                           placeholder="Enter your username" autocomplete="username">
                 </div>
 
-                <div class="form-group">
-                    <label for="password">Password:</label>
-                    <input type="password" id="password" name="password" required placeholder="Enter your password">
+                <div class="form-group password-toggle">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required 
+                           placeholder="Enter your password" autocomplete="current-password">
+                    <span class="toggle-icon" id="togglePassword">👁️</span>
                 </div>
 
-                <button type="submit" class="btn-primary btn-block">Login</button>
+                <button type="submit" class="btn-primary" id="loginBtn">
+                    Login
+                </button>
             </form>
 
             <div class="auth-footer">
@@ -50,5 +687,78 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+            document.getElementById('themeIcon').textContent = '☀️';
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            
+            body.classList.toggle('dark-theme');
+            
+            if (body.classList.contains('dark-theme')) {
+                themeIcon.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeIcon.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Password toggle functionality
+        const passwordField = document.getElementById('password');
+        const togglePassword = document.getElementById('togglePassword');
+        
+        togglePassword.addEventListener('click', function() {
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                togglePassword.textContent = '🙈';
+            } else {
+                passwordField.type = 'password';
+                togglePassword.textContent = '👁️';
+            }
+        });
+
+        // Form submission animation
+        document.getElementById('loginForm').addEventListener('submit', function() {
+            const btn = document.getElementById('loginBtn');
+            btn.classList.add('loading');
+            btn.textContent = 'Logging in...';
+        });
+
+        // Add focus animation to inputs
+        const inputs = document.querySelectorAll('.form-group input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                const label = this.parentElement.querySelector('label');
+                if (label) label.style.color = '#6366f1';
+            });
+            
+            input.addEventListener('blur', function() {
+                if (!this.value) {
+                    const label = this.parentElement.querySelector('label');
+                    const isDark = document.body.classList.contains('dark-theme');
+                    if (label) label.style.color = isDark ? '#cbd5e1' : '#4a5568';
+                }
+            });
+        });
+
+        // Auto-hide alerts after 5 seconds
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.style.animation = 'slideOut 0.5s ease-out';
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateX(30px)';
+                setTimeout(() => alert.remove(), 500);
+            }, 5000);
+        });
+    </script>
 </body>
 </html>

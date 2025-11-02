@@ -4,23 +4,681 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Create User - FamCare</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: #fdfefe;
+            color: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark-theme {
+            background: linear-gradient(135deg, #1a1c2e 0%, #2a1a3d 100%);
+            color: #e2e8f0;
+        }
+
+        /* Background Animation */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .gradient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.18;
+            animation: float-elegant 25s infinite ease-in-out;
+            transition: opacity 0.3s ease;
+        }
+
+        body.dark-theme .gradient-orb {
+            filter: blur(100px);
+            opacity: 0.15;
+        }
+
+        .orb1 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            top: -5%;
+            left: -5%;
+            animation-delay: 0s;
+        }
+
+        body.dark-theme .orb1 {
+            background: radial-gradient(circle at center, #6366f1 0%, #8b5cf6 100%);
+        }
+
+        .orb2 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #ec4899 0%, #f97316 100%);
+            bottom: -3%;
+            right: -3%;
+            animation-delay: 8s;
+        }
+
+        body.dark-theme .orb2 {
+            background: radial-gradient(circle at center, #ec4899 0%, #f97316 100%);
+        }
+
+        @keyframes float-elegant {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.18;
+            }
+            50% {
+                transform: translate(30px, -30px) scale(1.05);
+                opacity: 0.22;
+            }
+        }
+
+        body.dark-theme .orb1,
+        body.dark-theme .orb2 {
+            animation: float-elegant-dark 25s infinite ease-in-out;
+        }
+
+        @keyframes float-elegant-dark {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.15;
+            }
+            50% {
+                transform: translate(30px, -30px) scale(1.05);
+                opacity: 0.2;
+            }
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(99, 102, 241, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.025) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: grid-move 20s linear infinite;
+            transition: background-image 0.3s ease;
+        }
+
+        body.dark-theme .bg-animation::before {
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        }
+
+        @keyframes grid-move {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 14px 0;
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.07);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(20px) saturate(180%);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body.dark-theme .navbar {
+            background: rgba(30, 32, 52, 0.9);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .navbar .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .logo {
+            color: #f1f5f9;
+        }
+
+        .logo-icon {
+            font-size: 24px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        body.dark-theme .nav-links a {
+            color: #cbd5e1;
+        }
+
+        .nav-links a:hover {
+            color: #1a1a1a;
+        }
+
+        body.dark-theme .nav-links a:hover {
+            color: #ffffff;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1.5px solid rgba(99, 102, 241, 0.2);
+            color: #6366f1;
+            padding: 7px 11px;
+            border-radius: 7px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(99, 102, 241, 0.15);
+            transform: translateY(-2px);
+        }
+
+        body.dark-theme .theme-toggle {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+            color: #a5b4fc;
+        }
+
+        body.dark-theme .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Main Content */
+        .main-wrapper {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 20px;
+        }
+
+        .form-box {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 32px 30px;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            width: 100%;
+            max-width: 550px;
+            backdrop-filter: blur(12px);
+            transition: background 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
+            animation: zoomIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        body.dark-theme .form-box {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .form-box h2 {
+            text-align: center;
+            color: #1a1a1a;
+            margin-bottom: 24px;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: color 0.3s ease;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        body.dark-theme .form-box h2 {
+            color: #f1f5f9;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 11px 14px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-weight: 500;
+            font-size: 13px;
+            border-left: 3px solid;
+            animation: slideInRight 0.5s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .alert-error {
+            background: rgba(236, 72, 153, 0.1);
+            color: #db2777;
+            border-color: #ec4899;
+        }
+
+        body.dark-theme .alert-error {
+            background: rgba(236, 72, 153, 0.15);
+            color: #fda4af;
+            border-color: #f472b6;
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+            border-color: #22c55e;
+        }
+
+        body.dark-theme .alert-success {
+            background: rgba(34, 197, 94, 0.15);
+            color: #86efac;
+            border-color: #4ade80;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+            transition: border-color 0.3s ease;
+        }
+
+        body.dark-theme .tabs {
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-button {
+            padding: 10px 18px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            letter-spacing: -0.2px;
+        }
+
+        body.dark-theme .tab-button {
+            color: #94a3b8;
+        }
+
+        .tab-button.active {
+            color: #6366f1;
+            border-bottom-color: #6366f1;
+        }
+
+        body.dark-theme .tab-button.active {
+            color: #a5b4fc;
+            border-bottom-color: #a5b4fc;
+        }
+
+        .tab-button:hover:not(.active) {
+            color: #8b5cf6;
+        }
+
+        body.dark-theme .tab-button:hover:not(.active) {
+            color: #c4b5fd;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tab-content h3 {
+            margin-bottom: 18px;
+            color: #6366f1;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .tab-content h3 {
+            color: #a5b4fc;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #4a5568;
+            font-size: 13px;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .form-group label {
+            color: #cbd5e1;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+            color: #1a1a1a;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body.dark-theme .form-group input,
+        body.dark-theme .form-group select {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #6366f1;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        body.dark-theme .form-group input:focus,
+        body.dark-theme .form-group select:focus {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .form-group input::placeholder {
+            color: #94a3b8;
+        }
+
+        body.dark-theme .form-group input::placeholder {
+            color: #64748b;
+        }
+
+        .form-group select {
+            cursor: pointer;
+        }
+
+        body.dark-theme .form-group select option {
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            width: 100%;
+            padding: 11px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+            margin-top: 8px;
+            letter-spacing: -0.2px;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0px);
+        }
+
+        /* Form Footer */
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            transition: border-color 0.3s ease;
+        }
+
+        body.dark-theme .form-footer {
+            border-top-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .form-footer a {
+            color: #6366f1;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        body.dark-theme .form-footer a {
+            color: #a5b4fc;
+        }
+
+        .form-footer a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #6366f1;
+            transition: width 0.3s;
+        }
+
+        .form-footer a:hover::after {
+            width: 100%;
+        }
+
+        .form-footer a:hover {
+            color: #8b5cf6;
+        }
+
+        body.dark-theme .form-footer a:hover {
+            color: #ffffff;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-box {
+                padding: 28px 24px;
+                margin: 20px;
+            }
+
+            .form-box h2 {
+                font-size: 22px;
+            }
+
+            .navbar .container {
+                padding: 0 20px;
+            }
+
+            .nav-links {
+                gap: 12px;
+            }
+
+            .nav-links a {
+                font-size: 12px;
+            }
+
+            .theme-toggle {
+                padding: 6px 10px;
+                font-size: 14px;
+            }
+
+            .tab-button {
+                padding: 9px 14px;
+                font-size: 13px;
+            }
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
 </head>
 <body>
+    <!-- Background Animation -->
+    <div class="bg-animation">
+        <div class="gradient-orb orb1"></div>
+        <div class="gradient-orb orb2"></div>
+    </div>
+
+    <!-- Navbar -->
     <nav class="navbar">
         <div class="container">
-            <h1 class="logo">🏥 FamCare</h1>
+            <h1 class="logo">
+                <span class="logo-icon">🏥</span>
+                <span>FamCare</span>
+            </h1>
             <div class="nav-links">
-                <a href="/admin/dashboard">Admin Dashboard</a>
+                <a href="/admin/dashboard">Dashboard</a>
                 <a href="/admin/users">All Users</a>
+                <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">
+                    <span id="themeIcon">🌙</span>
+                </button>
                 <a href="/logout">Logout</a>
             </div>
         </div>
     </nav>
 
-    <div class="container">
+    <!-- Main Content -->
+    <div class="main-wrapper">
         <div class="form-box">
-            <h2>⚙️ Admin - Create User</h2>
+            <h2>
+                <span>⚙️</span>
+                <span>Admin - Create User</span>
+            </h2>
 
             <!-- Error message -->
             <div th:if="${error}" class="alert alert-error">
@@ -32,7 +690,7 @@
                 <p th:text="${success}"></p>
             </div>
 
-            <!-- Tabs for Parent/Child -->
+            <!-- Tabs -->
             <div class="tabs">
                 <button class="tab-button active" onclick="showTab('parent-tab')">Create Parent</button>
                 <button class="tab-button" onclick="showTab('child-tab')">Create Child</button>
@@ -43,26 +701,26 @@
                 <h3>Register New Parent</h3>
                 <form method="POST" th:action="@{/admin/create-parent}" class="form">
                     <div class="form-group">
-                        <label for="parent-username">Username:</label>
+                        <label for="parent-username">Username</label>
                         <input type="text" id="parent-username" name="username" required placeholder="e.g., parent1">
                     </div>
 
                     <div class="form-group">
-                        <label for="parent-password">Password:</label>
+                        <label for="parent-password">Password</label>
                         <input type="password" id="parent-password" name="password" required placeholder="Enter password">
                     </div>
 
                     <div class="form-group">
-                        <label for="parent-email">Email:</label>
+                        <label for="parent-email">Email</label>
                         <input type="email" id="parent-email" name="email" required placeholder="e.g., parent@example.com">
                     </div>
 
                     <div class="form-group">
-                        <label for="parent-name">Full Name:</label>
+                        <label for="parent-name">Full Name</label>
                         <input type="text" id="parent-name" name="fullName" required placeholder="e.g., John Doe">
                     </div>
 
-                    <button type="submit" class="btn-primary btn-block">Create Parent Account</button>
+                    <button type="submit" class="btn-primary">Create Parent Account</button>
                 </form>
             </div>
 
@@ -71,99 +729,105 @@
                 <h3>Register New Child</h3>
                 <form method="POST" th:action="@{/admin/create-child}" class="form">
                     <div class="form-group">
-                        <label for="child-username">Username:</label>
+                        <label for="child-username">Username</label>
                         <input type="text" id="child-username" name="username" required placeholder="e.g., child1">
                     </div>
 
                     <div class="form-group">
-                        <label for="child-password">Password:</label>
+                        <label for="child-password">Password</label>
                         <input type="password" id="child-password" name="password" required placeholder="Enter password">
                     </div>
 
                     <div class="form-group">
-                        <label for="child-email">Email:</label>
+                        <label for="child-email">Email</label>
                         <input type="email" id="child-email" name="email" required placeholder="e.g., child@example.com">
                     </div>
 
                     <div class="form-group">
-                        <label for="child-name">Full Name:</label>
+                        <label for="child-name">Full Name</label>
                         <input type="text" id="child-name" name="fullName" required placeholder="e.g., Sarah Doe">
                     </div>
 
                     <div class="form-group">
-                        <label for="parent-id">Parent:</label>
+                        <label for="parent-id">Parent</label>
                         <select id="parent-id" name="parentId" required>
                             <option value="">Select a parent...</option>
                             <option th:each="parent : ${parents}" th:value="${parent.id}" th:text="${parent.fullName} + ' (' + ${parent.username} + ')'"></option>
                         </select>
                     </div>
 
-                    <button type="submit" class="btn-primary btn-block">Create Child Account</button>
+                    <button type="submit" class="btn-primary">Create Child Account</button>
                 </form>
             </div>
 
             <div class="form-footer">
-                <a href="/admin/dashboard">Back to Dashboard</a>
+                <a href="/admin/dashboard">← Back to Dashboard</a>
             </div>
         </div>
     </div>
 
     <script>
+        // Theme Toggle
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+            document.getElementById('themeIcon').textContent = '☀️';
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            
+            body.classList.toggle('dark-theme');
+            
+            if (body.classList.contains('dark-theme')) {
+                themeIcon.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeIcon.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Tab Switching
         function showTab(tabName) {
-            // Hide all tabs
             const tabs = document.querySelectorAll('.tab-content');
             tabs.forEach(tab => tab.classList.remove('active'));
             
             const buttons = document.querySelectorAll('.tab-button');
             buttons.forEach(btn => btn.classList.remove('active'));
             
-            // Show selected tab
             document.getElementById(tabName).classList.add('active');
             event.target.classList.add('active');
         }
+
+        // Form Animations
+        const inputs = document.querySelectorAll('.form-group input, .form-group select');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                const label = this.parentElement.querySelector('label');
+                if (label) label.style.color = '#6366f1';
+            });
+            
+            input.addEventListener('blur', function() {
+                if (!this.value) {
+                    const label = this.parentElement.querySelector('label');
+                    const isDark = document.body.classList.contains('dark-theme');
+                    if (label) label.style.color = isDark ? '#cbd5e1' : '#4a5568';
+                }
+            });
+        });
+
+        // Auto-hide alerts after 5 seconds
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.style.animation = 'slideOut 0.5s ease-out';
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateX(30px)';
+                setTimeout(() => alert.remove(), 500);
+            }, 5000);
+        });
     </script>
-
-    <style>
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #ddd;
-        }
-
-        .tab-button {
-            padding: 12px 20px;
-            border: none;
-            background: none;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 500;
-            color: #666;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
-        }
-
-        .tab-button.active {
-            color: #4CAF50;
-            border-bottom-color: #4CAF50;
-        }
-
-        .tab-button:hover {
-            color: #4CAF50;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .tab-content h3 {
-            margin-bottom: 20px;
-            color: #4CAF50;
-        }
-    </style>
 </body>
 </html>
