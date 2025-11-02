@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Chat - Famcare</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .chat-header {
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h2 {
+            margin: 0;
+            font-size: 28px;
+            flex: 1;
+            text-align: center;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.8);
+            transform: translateX(-5px);
+        }
+
+        .back-btn:active {
+            transform: translateX(-2px);
+        }
+
+        .family-members-info {
+            font-size: 14px;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+
+        .chat-main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .chat-sidebar {
+            width: 250px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-title {
+            padding: 15px;
+            font-weight: bold;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            background: #f5f5f5;
+        }
+
+        .family-members-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .family-member {
+            padding: 12px;
+            margin: 5px 0;
+            background: #f9f9f9;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .family-member:hover {
+            background: #f0f0f0;
+            border-left-color: #667eea;
+        }
+
+        .member-role {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .chat-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 15px;
+            animation: slideIn 0.3s ease;
+            width: 100%;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.message-other {
+            justify-content: flex-start;
+        }
+
+        .message.message-own {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            display: flex;
+            flex-direction: column;
+            max-width: 60%;
+        }
+
+        .message-other .message-content {
+            align-items: flex-start;
+        }
+
+        .message-own .message-content {
+            align-items: flex-end;
+        }
+
+        .message-bubble {
+            padding: 12px 16px;
+            border-radius: 12px;
+            word-wrap: break-word;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .message-other .message-bubble {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .message-own .message-bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        /* Harmful message styling */
+        .message-bubble.harmful {
+            background: #ffebee !important;
+            color: #c62828 !important;
+            border: 2px solid #d32f2f;
+            font-weight: 500;
+        }
+
+        .message-own .message-bubble.harmful {
+            background: #c62828 !important;
+            color: white !important;
+            border: 2px solid #9c000d;
+        }
+
+        /* Concerning message styling */
+        .message-bubble.concerning {
+            background: #fff3e0 !important;
+            color: #e65100 !important;
+            border: 1px solid #ff9800;
+        }
+
+        .message-own .message-bubble.concerning {
+            background: #ff9800 !important;
+            color: white !important;
+            border: 1px solid #e65100;
+        }
+
+        .message-sender {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #666;
+        }
+
+        .message-own .message-sender {
+            color: #667eea;
+        }
+
+        .message-time {
+            font-size: 11px;
+            margin-top: 4px;
+            opacity: 0.7;
+        }
+
+        .message-delete-btn {
+            display: none;
+            font-size: 11px;
+            color: #999;
+            cursor: pointer;
+            margin-top: 4px;
+            padding: 2px 6px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 3px;
+            border: none;
+        }
+
+        .message-own .message-delete-btn {
+            display: inline-block;
+        }
+
+        .message-delete-btn:hover {
+            color: #d32f2f;
+            background: rgba(211, 47, 47, 0.1);
+        }
+
+        /* Confirmation Modal Styles */
+        .confirm-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .confirm-modal.active {
+            display: flex;
+        }
+
+        .confirm-dialog {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .confirm-dialog h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 20px;
+        }
+
+        .confirm-dialog p {
+            margin: 0 0 25px 0;
+            color: #666;
+            font-size: 15px;
+        }
+
+        .confirm-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .confirm-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .confirm-btn-cancel {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .confirm-btn-cancel:hover {
+            background: #e0e0e0;
+        }
+
+        .confirm-btn-delete {
+            background: #d32f2f;
+            color: white;
+        }
+
+        .confirm-btn-delete:hover {
+            background: #b71c1c;
+        }
+
+        .input-area {
+            background: white;
+            padding: 15px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .emoji-reactions {
+            display: flex;
+            gap: 8px;
+            padding-right: 10px;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .emoji-btn {
+            font-size: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+        }
+
+        .emoji-btn:hover {
+            background: #f0f0f0;
+            transform: scale(1.2);
+        }
+
+        .emoji-btn:active {
+            transform: scale(0.95);
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+            resize: none;
+            max-height: 100px;
+            min-height: 40px;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        .send-btn {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            min-width: 60px;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .send-btn:active {
+            transform: translateY(0);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px;
+            display: none;
+        }
+
+        .empty-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #999;
+            text-align: center;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .message-count {
+            padding: 10px 15px;
+            font-size: 12px;
+            color: #999;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+            background: #fafafa;
+        }
+
+        @media (max-width: 768px) {
+            .chat-sidebar {
+                display: none;
+            }
+
+            .message-bubble {
+                max-width: 85%;
+            }
+
+            .send-btn {
+                padding: 10px 15px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container" th:data-user-id="${loggedInUserId}">
+        <!-- Header -->
+        <div class="chat-header">
+            <a href="javascript:history.back()" class="back-btn">← Back</a>
+            <div style="flex: 1;">
+                <h2>👨‍👩‍👧‍👦 Family Chat</h2>
+                <div class="family-members-info">
+                    <span th:if="${familyMembers != null}" th:text="'Connected with ' + ${familyMembers.size()} + ' family members'"></span>
+                    <span th:unless="${familyMembers != null}">Loading family members...</span>
+                </div>
+            </div>
+            <div style="width: 60px;"></div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="chat-main">
+            <!-- Sidebar with Family Members -->
+            <div class="chat-sidebar">
+                <div class="sidebar-title">Family Members</div>
+                <div class="family-members-list">
+                    <div th:if="${familyMembers != null and familyMembers.size() > 0}">
+                        <div th:each="member : ${familyMembers}" class="family-member">
+                            <div>
+                                <strong th:text="${member.getFullName()}"></strong>
+                                <span th:if="${member.getId() == loggedInUserId}" style="color: #667eea; margin-left: 5px;">(You)</span>
+                            </div>
+                            <div class="member-role" th:text="${member.getRole()}"></div>
+                        </div>
+                    </div>
+                    <div th:unless="${familyMembers != null and familyMembers.size() > 0}" style="padding: 15px; text-align: center; color: #999;">
+                        <p>No family members found</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div class="chat-content">
+                <div class="error-message" id="errorMessage"></div>
+
+                <div class="messages-container" id="messagesContainer">
+                    <div class="empty-state" id="emptyState">
+                        <div>
+                            <p>💬 No messages yet. Start the conversation!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="message-count" id="messageCount"></div>
+
+                <!-- Message Input -->
+                <div class="input-area">
+                    <div class="emoji-reactions">
+                        <button class="emoji-btn" title="Happy" onclick="insertEmoji('😊')">😊</button>
+                        <button class="emoji-btn" title="Love" onclick="insertEmoji('❤️')">❤️</button>
+                        <button class="emoji-btn" title="Thumbs Up" onclick="insertEmoji('👍')">👍</button>
+                        <button class="emoji-btn" title="Sad" onclick="insertEmoji('😢')">😢</button>
+                        <button class="emoji-btn" title="Laugh" onclick="insertEmoji('😂')">😂</button>
+                    </div>
+                    <textarea class="message-input" id="messageInput" placeholder="Type your message here..." rows="1"></textarea>
+                    <button class="send-btn" id="sendBtn">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="confirm-modal" id="confirmModal">
+        <div class="confirm-dialog">
+            <h3>🗑️ Delete Message</h3>
+            <p>Are you sure you want to delete this message? This action cannot be undone.</p>
+            <div class="confirm-buttons">
+                <button class="confirm-btn confirm-btn-cancel" id="confirmCancel">Cancel</button>
+                <button class="confirm-btn confirm-btn-delete" id="confirmDelete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const emptyState = document.getElementById('emptyState');
+        const messageCount = document.getElementById('messageCount');
+        const loggedInUserId = parseInt(document.querySelector('.chat-container').getAttribute('data-user-id'), 10);
+        
+        // Confirmation modal elements
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmCancelBtn = document.getElementById('confirmCancel');
+        const confirmDeleteBtn = document.getElementById('confirmDelete');
+        let pendingDeleteMessageId = null;
+
+        // Auto-resize textarea
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
+
+        // Insert emoji into message
+        function insertEmoji(emoji) {
+            const cursorPos = messageInput.selectionStart;
+            const textBefore = messageInput.value.substring(0, cursorPos);
+            const textAfter = messageInput.value.substring(cursorPos);
+            
+            messageInput.value = textBefore + emoji + textAfter;
+            messageInput.selectionStart = messageInput.selectionEnd = cursorPos + emoji.length;
+            messageInput.focus();
+            
+            // Auto-resize after emoji insertion
+            messageInput.style.height = 'auto';
+            messageInput.style.height = Math.min(messageInput.scrollHeight, 100) + 'px';
+        }
+
+        // Send message on button click
+        sendBtn.addEventListener('click', sendMessage);
+
+        // Send message on Enter key (but allow Shift+Enter for new line)
+        messageInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Send message function
+        function sendMessage() {
+            const text = messageInput.value.trim();
+            if (!text) return;
+
+            sendBtn.disabled = true;
+            const originalText = sendBtn.textContent;
+            sendBtn.innerHTML = '<span class="loading-spinner"></span>';
+
+            fetch('/chat/send-message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'messageText=' + encodeURIComponent(text)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'error') {
+                    showError(data.message);
+                } else {
+                    messageInput.value = '';
+                    messageInput.style.height = 'auto';
+                    loadMessages();
+                }
+            })
+            .catch(error => {
+                showError('Failed to send message: ' + error);
+            })
+            .finally(() => {
+                sendBtn.disabled = false;
+                sendBtn.textContent = originalText;
+            });
+        }
+
+        // Load all messages
+        function loadMessages() {
+            fetch('/chat/get-messages')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load messages');
+                    }
+                    return response.json();
+                })
+                .then(messages => {
+                    if (Array.isArray(messages)) {
+                        displayMessages(messages);
+                    } else {
+                        displayMessages([]);
+                    }
+                })
+                .catch(error => {
+                    console.error('Failed to load messages:', error);
+                    displayMessages([]);
+                });
+        }
+
+        // Display messages
+        let lastMessageCount = 0;
+        
+        function displayMessages(messages) {
+            if (messages.length === 0) {
+                if (lastMessageCount !== 0) {
+                    messagesContainer.innerHTML = '<div class="empty-state"><div><p>💬 No messages yet. Start the conversation!</p></div></div>';
+                    messageCount.innerHTML = '0 messages';
+                    lastMessageCount = 0;
+                }
+                return;
+            }
+
+            // Only update if message count changed (prevents blinking)
+            if (messages.length === lastMessageCount && messagesContainer.children.length > 0) {
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            messagesContainer.innerHTML = '';
+
+            messages.forEach(msg => {
+                const isOwn = msg.senderId === loggedInUserId;
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message ' + (isOwn ? 'message-own' : 'message-other');
+
+                const timeStr = new Date(msg.sentAt).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+
+                const senderDiv = document.createElement('div');
+                senderDiv.className = 'message-sender';
+                
+                let senderText = msg.senderName;
+                if (msg.sentiment === 'HARMFUL') {
+                    senderText += ' ⚠️ ALERT';
+                } else if (msg.sentiment === 'CONCERNING') {
+                    senderText += ' ⚠️';
+                }
+                senderDiv.textContent = senderText;
+
+                const bubbleDiv = document.createElement('div');
+                bubbleDiv.className = 'message-bubble';
+                
+                // Add sentiment class
+                if (msg.sentiment === 'HARMFUL') {
+                    bubbleDiv.classList.add('harmful');
+                } else if (msg.sentiment === 'CONCERNING') {
+                    bubbleDiv.classList.add('concerning');
+                }
+
+                const textDiv = document.createElement('div');
+                textDiv.textContent = escapeHtml(msg.messageText);
+                textDiv.style.marginBottom = '4px';
+
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                timeDiv.textContent = timeStr;
+
+                bubbleDiv.appendChild(textDiv);
+                bubbleDiv.appendChild(timeDiv);
+
+                if (isOwn) {
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'message-delete-btn';
+                    deleteBtn.textContent = 'Delete';
+                    deleteBtn.onclick = function() { deleteMessage(msg.id); };
+                    bubbleDiv.appendChild(deleteBtn);
+                }
+
+                contentDiv.appendChild(senderDiv);
+                contentDiv.appendChild(bubbleDiv);
+                messageDiv.appendChild(contentDiv);
+
+                messagesContainer.appendChild(messageDiv);
+            });
+
+            lastMessageCount = messages.length;
+            messageCount.innerHTML = messages.length + ' message' + (messages.length !== 1 ? 's' : '');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Delete message
+        function deleteMessage(messageId) {
+            pendingDeleteMessageId = messageId;
+            confirmModal.classList.add('active');
+        }
+
+        // Cancel delete
+        confirmCancelBtn.addEventListener('click', function() {
+            confirmModal.classList.remove('active');
+            pendingDeleteMessageId = null;
+        });
+
+        // Confirm delete
+        confirmDeleteBtn.addEventListener('click', function() {
+            if (!pendingDeleteMessageId) return;
+
+            fetch('/chat/delete-message/' + pendingDeleteMessageId, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                confirmModal.classList.remove('active');
+                if (data.status === 'success') {
+                    loadMessages();
+                } else {
+                    showError(data.message);
+                }
+            })
+            .catch(error => {
+                showError('Failed to delete message: ' + error);
+                confirmModal.classList.remove('active');
+            })
+            .finally(() => {
+                pendingDeleteMessageId = null;
+            });
+        });
+
+        // Close modal when clicking outside
+        confirmModal.addEventListener('click', function(e) {
+            if (e.target === confirmModal) {
+                confirmModal.classList.remove('active');
+                pendingDeleteMessageId = null;
+            }
+        });
+
+        // Show error message
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorMessage.style.display = 'block';
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 4000);
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Load messages every 3 seconds (poll for new messages)
+        setInterval(function() {
+            loadMessages();
+        }, 3000);
+
+        // Load initial messages
+        loadMessages();
+    </script>
+</body>
+</html>

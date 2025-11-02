@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -144,5 +141,39 @@ public class AdminController {
             model.addAttribute("parents", userRepository.findByRole("PARENT"));
             return "admin/create-user";
         }
+    }
+
+    /**
+     * DELETE - Delete a user by ID
+     */
+    @PostMapping("/delete-user/{userId}")
+    public String deleteUser(
+            @PathVariable Integer userId,
+            Model model) {
+
+        try {
+            // Check if user exists
+            var userOptional = userRepository.findById(userId);
+            if (userOptional.isEmpty()) {
+                model.addAttribute("error", "User not found!");
+                return "redirect:/admin/users";
+            }
+
+            User user = userOptional.get();
+            String deletedUsername = user.getUsername();
+            String deletedUserRole = user.getRole();
+
+            // Delete the user
+            userRepository.deleteById(userId);
+
+            System.out.println("✅ User deleted: " + deletedUsername + " (" + deletedUserRole + ")");
+            model.addAttribute("success", "User '" + deletedUsername + "' deleted successfully!");
+
+        } catch (Exception e) {
+            System.err.println("❌ Error deleting user: " + e.getMessage());
+            model.addAttribute("error", "Error deleting user: " + e.getMessage());
+        }
+
+        return "redirect:/admin/users";
     }
 }

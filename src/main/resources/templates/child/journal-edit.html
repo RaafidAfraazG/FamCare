@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Journal Entry - FamCare</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .checkbox-info {
+            background: #e3f2fd;
+            border-left: 4px solid #1976d2;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1565c0;
+        }
+
+        .checkbox-info strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .edit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .edit-header h1 {
+            margin: 0;
+        }
+
+        .entry-meta {
+            color: #999;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-cancel {
+            background: #f0f0f0;
+            color: #333;
+            padding: 10px 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel:hover {
+            background: #e0e0e0;
+            border-color: #999;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏥 FamCare</h1>
+            <div class="nav-links">
+                <span>Welcome, Child!</span>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard">
+            <div class="edit-header">
+                <h1>Edit Journal Entry ✏️</h1>
+                <a href="/child/journal" class="btn-cancel">← Back</a>
+            </div>
+
+            <!-- Error/Success messages -->
+            <div th:if="${error}" class="alert alert-error">
+                <p th:text="${error}"></p>
+            </div>
+            <div th:if="${success}" class="alert alert-success">
+                <p th:text="${success}"></p>
+            </div>
+
+            <!-- Edit Entry Form -->
+            <div class="section">
+                <form method="POST" th:action="@{/child/journal/{id}/update(id=${entry.id})}" class="form">
+                    <div class="form-group">
+                        <label for="title">Title:</label>
+                        <input type="text" id="title" name="title" required placeholder="Give your entry a title..." th:value="${entry.title}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="content">Content:</label>
+                        <textarea id="content" name="content" rows="8" required placeholder="Write your thoughts and feelings..." th:text="${entry.content}"></textarea>
+                    </div>
+
+                    <!-- Privacy Setting with Clear Instructions -->
+                    <div class="form-group">
+                        <label for="isPrivate">Privacy Setting:</label>
+                        
+                        <!-- Hidden field to always send a value -->
+                        <input type="hidden" name="isPrivate" value="false">
+                        
+                        <label style="display: flex; align-items: center; margin-top: 10px;">
+                            <input type="checkbox" id="isPrivate" name="isPrivate" value="true" style="width: auto; margin-right: 8px;" th:checked="${entry.isPrivate}">
+                            <span>🔒 Keep this entry private (only you can see it)</span>
+                        </label>
+
+                        <div class="checkbox-info">
+                            <strong>📌 How it works:</strong>
+                            ✓ <strong>CHECKED</strong> = 🔒 Private (Only you can see)<br>
+                            ☐ <strong>UNCHECKED</strong> = 👁️ Shared (Your parents can see)
+                        </div>
+                    </div>
+
+                    <div class="form-buttons">
+                        <button type="submit" class="btn-primary">💾 Save Changes</button>
+                        <a href="/child/journal" class="btn-cancel">Cancel</a>
+                    </div>
+                </form>
+
+                <div class="entry-meta">
+                    <p>Created: <span th:text="${entry.createdAt}"></span></p>
+                    <p>Last Updated: <span th:text="${entry.updatedAt}"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Handle checkbox submission behavior
+        document.getElementById('isPrivate').addEventListener('change', function() {
+            if (this.checked) {
+                console.log('Entry will be PRIVATE (only you see)');
+            } else {
+                console.log('Entry will be SHARED (parents can see)');
+            }
+        });
+    </script>
+</body>
+</html>

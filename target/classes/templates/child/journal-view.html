@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Journal Entry - FamCare</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .entry-header h1 {
+            margin: 0;
+            flex: 1;
+        }
+
+        .entry-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .badge-private {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .badge-shared {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .entry-content {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+            line-height: 1.8;
+            color: #333;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .entry-meta {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .meta-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .meta-item:last-child {
+            border-bottom: none;
+        }
+
+        .meta-label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            display: inline-block;
+            padding: 12px 20px;
+            background: #f0f0f0;
+            color: #333;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            border-color: #999;
+        }
+
+        .btn-danger {
+            display: inline-block;
+            padding: 12px 20px;
+            background: #ffebee;
+            color: #c62828;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            border: 1px solid #ef5350;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background: #ffcdd2;
+            border-color: #c62828;
+        }
+
+        .section {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Dialog Styles */
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .dialog-box {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 400px;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dialog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .dialog-header h3 {
+            margin: 0;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .dialog-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s ease;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dialog-close:hover {
+            color: #333;
+        }
+
+        .dialog-content {
+            padding: 20px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .dialog-content p {
+            margin: 10px 0;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+            justify-content: flex-end;
+        }
+
+        .dialog-btn-cancel {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .dialog-btn-cancel:hover {
+            background: #e0e0e0;
+            border-color: #999;
+        }
+
+        .dialog-btn-delete {
+            padding: 10px 20px;
+            background: #d32f2f;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .dialog-btn-delete:hover {
+            background: #b71c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(211, 47, 47, 0.3);
+        }
+
+        .dialog-btn-delete:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏥 FamCare</h1>
+            <div class="nav-links">
+                <span>Welcome, Child!</span>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard">
+            <!-- Error/Success messages -->
+            <div th:if="${error}" class="alert alert-error">
+                <p th:text="${error}"></p>
+            </div>
+            <div th:if="${success}" class="alert alert-success">
+                <p th:text="${success}"></p>
+            </div>
+
+            <!-- Entry Header -->
+            <div class="entry-header">
+                <h1 th:text="${entry.title}"></h1>
+                <span th:if="${entry.isPrivate}" class="entry-badge badge-private">🔒 Private</span>
+                <span th:unless="${entry.isPrivate}" class="entry-badge badge-shared">👁️ Shared</span>
+            </div>
+
+            <!-- Entry Metadata -->
+            <div class="entry-meta">
+                <div class="meta-item">
+                    <span class="meta-label">Created:</span>
+                    <span th:text="${entry.createdAt}"></span>
+                </div>
+                <div class="meta-item" th:if="${entry.updatedAt != null}">
+                    <span class="meta-label">Last Updated:</span>
+                    <span th:text="${entry.updatedAt}"></span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Privacy:</span>
+                    <span th:if="${entry.isPrivate}" style="color: #c62828;">🔒 Only you can see this entry</span>
+                    <span th:unless="${entry.isPrivate}" style="color: #1976d2;">👁️ Your parents can see this entry</span>
+                </div>
+            </div>
+
+            <!-- Entry Content -->
+            <div class="entry-content" th:text="${entry.content}"></div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a th:href="@{/child/journal/{id}/edit(id=${entry.id})}" class="btn-primary">✏️ Edit Entry</a>
+                <a href="/child/journal" class="btn-secondary">← Back to Journal</a>
+                <button type="button" class="btn-danger" onclick="showDeleteDialog()">🗑️ Delete Entry</button>
+            </div>
+
+            <!-- Delete Confirmation Dialog -->
+            <div id="deleteDialog" class="dialog-overlay" style="display: none;">
+                <div class="dialog-box">
+                    <div class="dialog-header">
+                        <h3>🗑️ Delete Entry</h3>
+                        <button type="button" class="dialog-close" onclick="closeDeleteDialog()">&times;</button>
+                    </div>
+                    <div class="dialog-content">
+                        <p>Are you sure you want to delete this journal entry?</p>
+                        <p style="color: #d32f2f; font-weight: bold;">⚠️ This action cannot be undone!</p>
+                    </div>
+                    <div class="dialog-buttons">
+                        <button type="button" class="dialog-btn-cancel" onclick="closeDeleteDialog()">Cancel</button>
+                        <form method="POST" th:action="@{/child/journal/{id}/delete(id=${entry.id})}" style="display: inline;">
+                            <button type="submit" class="dialog-btn-delete">Delete Entry</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Info -->
+            <div class="section" style="background: #f9f9f9; margin-top: 30px;">
+                <h3>💡 Tips</h3>
+                <ul style="line-height: 1.8; color: #555; margin: 0; padding-left: 20px;">
+                    <li>You can edit this entry anytime by clicking the Edit button</li>
+                    <li>Changed your mind about sharing? You can toggle the privacy setting when editing</li>
+                    <li>Deleted entries cannot be recovered, so be careful!</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Delete Dialog Functions
+        function showDeleteDialog() {
+            document.getElementById('deleteDialog').style.display = 'flex';
+        }
+
+        function closeDeleteDialog() {
+            document.getElementById('deleteDialog').style.display = 'none';
+        }
+
+        // Close dialog when clicking outside the dialog box
+        document.getElementById('deleteDialog').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteDialog();
+            }
+        });
+
+        // Close dialog with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDeleteDialog();
+            }
+        });
+    </script>
+</body>
+</html>

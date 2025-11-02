@@ -171,4 +171,20 @@ public class FamilyController {
 
         return "family/child-insights";
     }
+
+    /**
+     * Access family chat
+     * Both parents and children can access this
+     */
+    @GetMapping("/chat")
+    public String familyChat(HttpSession session, Model model) {
+        Integer userId = getLoggedInUserId(session);
+        
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        // Redirect to actual chat page
+        return "redirect:/chat/family";
+    }
 }

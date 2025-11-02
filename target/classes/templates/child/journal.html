@@ -5,6 +5,137 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Journal - FamCare</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .checkbox-info {
+            background: #e3f2fd;
+            border-left: 4px solid #1976d2;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1565c0;
+        }
+
+        .checkbox-info strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        /* Dialog Styles */
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .dialog-box {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 400px;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dialog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .dialog-header h3 {
+            margin: 0;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .dialog-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s ease;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+        }
+
+        .dialog-close:hover {
+            color: #333;
+        }
+
+        .dialog-content {
+            padding: 20px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .dialog-content p {
+            margin: 10px 0;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+            justify-content: flex-end;
+        }
+
+        .dialog-btn-cancel {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .dialog-btn-cancel:hover {
+            background: #e0e0e0;
+            border-color: #999;
+        }
+
+        .dialog-btn-delete {
+            padding: 10px 20px;
+            background: #d32f2f;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .dialog-btn-delete:hover {
+            background: #b71c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(211, 47, 47, 0.3);
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -43,11 +174,23 @@
                         <textarea id="content" name="content" rows="8" required placeholder="Write your thoughts and feelings..."></textarea>
                     </div>
 
-                    <div class="form-group checkbox">
-                        <label>
-                            <input type="checkbox" name="isPrivate" value="true" checked>
-                            Keep this entry private (only you can see it)
+                    <!-- Privacy Setting with Clear Instructions -->
+                    <div class="form-group">
+                        <label for="isPrivate">Privacy Setting:</label>
+                        
+                        <!-- Hidden field to always send a value -->
+                        <input type="hidden" name="isPrivate" value="false">
+                        
+                        <label style="display: flex; align-items: center; margin-top: 10px;">
+                            <input type="checkbox" id="isPrivate" name="isPrivate" value="true" style="width: auto; margin-right: 8px;">
+                            <span>🔒 Keep this entry private (only you can see it)</span>
                         </label>
+
+                        <div class="checkbox-info">
+                            <strong>📌 How it works:</strong>
+                            ✓ <strong>CHECKED</strong> = 🔒 Private (Only you can see)<br>
+                            ☐ <strong>UNCHECKED</strong> = 👁️ Shared (Your parents can see)
+                        </div>
                     </div>
 
                     <button type="submit" class="btn-primary">Save Entry</button>
@@ -71,10 +214,9 @@
                         <p class="journal-excerpt" th:text="${entry.content.length() > 150 ? entry.content.substring(0, 150) + '...' : entry.content}"></p>
 
                         <div class="journal-actions">
-                            <a th:href="@{/child/journal/{id}(id=${entry.id})}" class="btn-secondary btn-small">View</a>
-                            <form method="POST" th:action="@{/child/journal/{id}/delete(id=${entry.id})}" style="display: inline;">
-                                <button type="submit" class="btn-danger btn-small" onclick="return confirm('Delete this entry?')">Delete</button>
-                            </form>
+                            <a th:href="@{/child/journal/{id}(id=${entry.id})}" class="btn-secondary btn-small">👁️ View</a>
+                            <a th:href="@{/child/journal/{id}/edit(id=${entry.id})}" class="btn-secondary btn-small">✏️ Edit</a>
+                            <button type="button" class="btn-danger btn-small delete-btn" th:data-entry-id="${entry.id}" th:data-entry-title="${entry.title}">🗑️ Delete</button>
                         </div>
                     </div>
                 </div>
@@ -88,7 +230,79 @@
             <div class="action-buttons">
                 <a href="/child/dashboard" class="btn-secondary">Back to Dashboard</a>
             </div>
+
+            <!-- Delete Confirmation Dialog -->
+            <div id="deleteDialog" class="dialog-overlay" style="display: none;">
+                <div class="dialog-box">
+                    <div class="dialog-header">
+                        <h3>🗑️ Delete Entry</h3>
+                        <button type="button" class="dialog-close" onclick="closeDeleteDialog()">&times;</button>
+                    </div>
+                    <div class="dialog-content">
+                        <p><strong id="deleteEntryTitle"></strong></p>
+                        <p>Are you sure you want to delete this journal entry?</p>
+                        <p style="color: #d32f2f; font-weight: bold;">⚠️ This action cannot be undone!</p>
+                    </div>
+                    <div class="dialog-buttons">
+                        <button type="button" class="dialog-btn-cancel" onclick="closeDeleteDialog()">Cancel</button>
+                        <form id="deleteForm" method="POST" style="display: inline;">
+                            <button type="submit" class="dialog-btn-delete">Delete Entry</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <script>
+        // Delete Dialog Functions
+        function showDeleteDialog(entryId, entryTitle) {
+            document.getElementById('deleteEntryTitle').textContent = entryTitle;
+            document.getElementById('deleteForm').action = '/child/journal/' + entryId + '/delete';
+            document.getElementById('deleteDialog').style.display = 'flex';
+        }
+
+        function closeDeleteDialog() {
+            document.getElementById('deleteDialog').style.display = 'none';
+        }
+
+        // Add event listeners to all delete buttons
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const entryId = this.getAttribute('data-entry-id');
+                const entryTitle = this.getAttribute('data-entry-title');
+                showDeleteDialog(entryId, entryTitle);
+            });
+        });
+
+        // Close dialog when clicking outside the dialog box
+        const deleteDialog = document.getElementById('deleteDialog');
+        if (deleteDialog) {
+            deleteDialog.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeDeleteDialog();
+                }
+            });
+        }
+
+        // Close dialog with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDeleteDialog();
+            }
+        });
+
+        // Handle checkbox submission behavior
+        const privateCheckbox = document.getElementById('isPrivate');
+        if (privateCheckbox) {
+            privateCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    console.log('Entry will be PRIVATE (only you see)');
+                } else {
+                    console.log('Entry will be SHARED (parents can see)');
+                }
+            });
+        }
+    </script>
 </body>
 </html>

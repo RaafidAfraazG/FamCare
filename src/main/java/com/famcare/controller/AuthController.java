@@ -57,6 +57,18 @@ public class AuthController {
         session.setAttribute("userRole", user.getRole());
         session.setAttribute("userName", user.getFullName());
 
+        // Set parent ID for family chat access
+        // For parents: their own ID
+        // For children: their parent's ID
+        if ("CHILD".equalsIgnoreCase(user.getRole())) {
+            Integer parentId = user.getParentId();
+            session.setAttribute("parentId", parentId);
+            System.out.println("Child login - ParentId set to: " + parentId);
+        } else {
+            session.setAttribute("parentId", user.getId());
+            System.out.println("Parent login - ParentId set to: " + user.getId());
+        }
+
         // Redirect based on role
         if ("PARENT".equalsIgnoreCase(user.getRole())) {
             return "redirect:/parent/dashboard";

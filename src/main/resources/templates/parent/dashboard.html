@@ -5,6 +5,238 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parent Dashboard - FamCare</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .chat-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-banner-content h2 {
+            margin: 0 0 8px 0;
+            font-size: 24px;
+        }
+
+        .chat-banner-content p {
+            margin: 0;
+            opacity: 0.95;
+            font-size: 15px;
+        }
+
+        .chat-banner-button {
+            background: white;
+            color: #667eea;
+            padding: 12px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            margin-left: 20px;
+        }
+
+        .chat-banner-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .child-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .child-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .child-header {
+            margin-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 12px;
+        }
+
+        .child-header h3 {
+            margin: 0;
+            color: #333;
+            font-size: 20px;
+        }
+
+        .child-header small {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .child-info {
+            margin: 12px 0;
+        }
+
+        .child-info p {
+            margin: 8px 0;
+            color: #555;
+        }
+
+        .child-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #f0f0f0;
+            color: #333;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            border-color: #999;
+        }
+
+        .family-wellness-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-left: none !important;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .family-wellness-section h2 {
+            color: white;
+            margin-top: 0;
+        }
+
+        .family-wellness-section p {
+            opacity: 0.95;
+            margin-bottom: 15px;
+        }
+
+        .family-wellness-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .family-wellness-buttons a {
+            display: inline-block;
+            padding: 12px 20px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .family-wellness-buttons a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .info-section {
+            background: #f9f9f9;
+        }
+
+        .info-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .info-section li {
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+            color: #555;
+            font-size: 15px;
+        }
+
+        .info-section li:last-child {
+            border-bottom: none;
+        }
+
+        .no-data {
+            color: #999;
+            font-style: italic;
+            padding: 20px;
+            text-align: center;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .chat-banner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .chat-banner-button {
+                margin-left: 0;
+                margin-top: 15px;
+                width: 100%;
+                text-align: center;
+            }
+
+            .family-wellness-buttons {
+                flex-direction: column;
+            }
+
+            .family-wellness-buttons a {
+                width: 100%;
+            }
+
+            .child-actions {
+                flex-direction: column;
+            }
+
+            .child-actions a {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -22,14 +254,23 @@
         <div class="dashboard">
             <h1>Parent Dashboard 👨‍👩‍👧</h1>
 
+            <!-- Family Chat Banner -->
+            <div class="chat-banner">
+                <div class="chat-banner-content">
+                    <h2>💬 Family Chat</h2>
+                    <p>Keep in touch with your children and family members</p>
+                </div>
+                <a href="/chat/family" class="chat-banner-button">💬 Open Chat</a>
+            </div>
+
             <!-- Family Wellness Quick Access -->
-            <div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-left: none;">
-                <h2 style="color: white; margin-top: 0;">👨‍👩‍👧 Family Wellness Center</h2>
+            <div class="section family-wellness-section">
+                <h2>👨‍👩‍👧 Family Wellness Center</h2>
                 <p>View family-wide insights, mood trends, and intervention alerts for all members.</p>
-                <div class="action-buttons" style="margin-top: 15px;">
-                    <a href="/family/dashboard" class="btn-primary" style="background: white; color: #667eea;">📊 Go to Family Dashboard</a>
-                    <a href="/family/alerts" class="btn-primary" style="background: #ff6b6b;">🔔 View Alerts</a>
-                    <a href="/family/insights" class="btn-primary" style="background: #4ecdc4;">💡 View Insights</a>
+                <div class="family-wellness-buttons">
+                    <a href="/family/dashboard">📊 Family Dashboard</a>
+                    <a href="/family/alerts">🔔 View Alerts</a>
+                    <a href="/family/insights">💡 View Insights</a>
                 </div>
             </div>
 
@@ -54,12 +295,13 @@
                         </div>
 
                         <div class="child-info">
-                            <p>Email: <span th:text="${child.email}"></span></p>
+                            <p><strong>Email:</strong> <span th:text="${child.email}"></span></p>
                         </div>
 
                         <div class="child-actions">
-                            <a th:href="@{/parent/child/{id}/analytics(id=${child.id})}" class="btn-primary">View Analytics</a>
-                            <a th:href="@{/parent/child/{id}/mood-chart(id=${child.id})}" class="btn-secondary">View Mood Chart</a>
+                            <a th:href="@{/parent/child/{id}/analytics(id=${child.id})}" class="btn-primary">📊 View Analytics</a>
+                            <a th:href="@{/parent/child/{id}/mood-chart(id=${child.id})}" class="btn-primary">📈 View Mood Chart</a>
+                            <a href="/chat/family" class="btn-secondary">💬 Send Message</a>
                         </div>
                     </div>
                 </div>
@@ -77,6 +319,7 @@
                     <li>✅ You can view individual mood trends and shared journal entries</li>
                     <li>✅ Access family-wide insights and intervention alerts</li>
                     <li>✅ Private entries remain completely private - only they can see</li>
+                    <li>✅ Use Family Chat to stay connected and discuss wellness with your children</li>
                     <li>✅ Use insights to have meaningful conversations about their wellness</li>
                 </ul>
             </div>

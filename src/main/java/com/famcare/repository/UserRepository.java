@@ -111,4 +111,22 @@ public class UserRepository {
         String sql = "UPDATE users SET email = ?, full_name = ? WHERE id = ?";
         jdbcTemplate.update(sql, user.getEmail(), user.getFullName(), user.getId());
     }
+
+    /**
+     * Delete a user by ID
+     */
+    public void deleteById(Integer id) {
+        String sql = "DELETE FROM users WHERE id = ?";
+        try {
+            int rowsAffected = jdbcTemplate.update(sql, id);
+            if (rowsAffected > 0) {
+                System.out.println("✅ User deleted from database: ID " + id);
+            } else {
+                System.out.println("⚠️ User not found: ID " + id);
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Error deleting user: " + e.getMessage());
+            throw new RuntimeException("Failed to delete user: " + e.getMessage());
+        }
+    }
 }

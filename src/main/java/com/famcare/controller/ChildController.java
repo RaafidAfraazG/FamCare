@@ -119,7 +119,7 @@ public class ChildController {
     }
 
     /**
-     * Show journal entry page
+     * Show journal entry list page (READ - List all)
      */
     @GetMapping("/journal")
     public String showJournalPage(HttpSession session, Model model) {
@@ -137,13 +137,13 @@ public class ChildController {
     }
 
     /**
-     * Handle journal entry creation
+     * CREATE - Handle journal entry creation
      */
     @PostMapping("/journal")
     public String createJournalEntry(
             @RequestParam String title,
             @RequestParam String content,
-            @RequestParam(defaultValue = "true") Boolean isPrivate,
+            @RequestParam(required = false) Boolean isPrivate,
             HttpSession session,
             Model model) {
 
@@ -154,20 +154,22 @@ public class ChildController {
         Integer userId = getLoggedInUserId(session);
 
         try {
-            journalService.createJournalEntry(userId, title, content, isPrivate);
+            // Handle checkbox logic: if null (unchecked), default to false (shared)
+            boolean privateEntry = isPrivate != null && isPrivate;
+            
+            journalService.createJournalEntry(userId, title, content, privateEntry);
             model.addAttribute("success", "Journal entry created successfully!");
             return "redirect:/child/journal";
         } catch (Exception e) {
             model.addAttribute("error", "Error creating journal entry: " + e.getMessage());
-            Integer userId2 = getLoggedInUserId(session);
-            List<JournalEntry> entries = journalService.getUserJournalEntries(userId2);
+            List<JournalEntry> entries = journalService.getUserJournalEntries(userId);
             model.addAttribute("journalEntries", entries);
             return "child/journal";
         }
     }
 
     /**
-     * View a single journal entry
+     * READ - View a single journal entry
      */
     @GetMapping("/journal/{id}")
     public String viewJournalEntry(
@@ -181,19 +183,106 @@ public class ChildController {
 
         Integer userId = getLoggedInUserId(session);
 
-        var entry = journalService.getJournalEntryById(id);
+        try {
+            var entry = journalService.getJournalEntryById(id);
 
-        if (entry.isEmpty() || !entry.get().getUserId().equals(userId)) {
-            model.addAttribute("error", "Journal entry not found or access denied");
+            if (entry.isEmpty() || !entry.get().getUserId().equals(userId)) {
+                model.addAttribute("error", "Journal entry not found or access denied");
+                return "redirect:/child/journal";
+            }
+
+            model.addAttribute("entry", entry.get());
+        } catch (Exception e) {
+            model.addAttribute("error", "Error loading journal entry: " + e.getMessage());
             return "redirect:/child/journal";
         }
 
-        model.addAttribute("entry", entry.get());
         return "child/journal-view";
     }
 
     /**
-     * Delete a journal entry
+     * UPDATE - Show edit form for journal entry
+     */
+    @GetMapping("/journal/{id}/edit")
+    public String showEditJournalForm(
+            @PathVariable Integer id,
+            HttpSession session,
+            Model model) {
+
+        if (!isChildLoggedIn(session)) {
+            return "redirect:/login";
+        }
+
+        Integer userId = getLoggedInUserId(session);
+
+        try {
+            var entry = journalService.getJournalEntryById(id);
+
+            if (entry.isEmpty() || !entry.get().getUserId().equals(userId)) {
+                model.addAttribute("error", "Journal entry not found or access denied");
+                return "redirect:/child/journal";
+            }
+
+            model.addAttribute("entry", entry.get());
+        } catch (Exception e) {
+            model.addAttribute("error", "Error loading journal entry: " + e.getMessage());
+            return "redirect:/child/journal";
+        }
+
+        return "child/journal-edit";
+    }
+
+    /**
+     * UPDATE - Handle journal entry update
+     */
+    @PostMapping("/journal/{id}/update")
+    public String updateJournalEntry(
+            @PathVariable Integer id,
+            @RequestParam String title,
+            @RequestParam String content,
+            @RequestParam(required = false) Boolean isPrivate,
+            HttpSession session,
+            Model model) {
+
+        if (!isChildLoggedIn(session)) {
+            return "redirect:/login";
+        }
+
+        Integer userId = getLoggedInUserId(session);
+
+        try {
+            // Verify ownership
+            if (!journalService.isJournalEntryOwnedBy(id, userId)) {
+                model.addAttribute("error", "Access denied");
+                return "redirect:/child/journal";
+            }
+
+            // Handle checkbox logic
+            boolean privateEntry = isPrivate != null && isPrivate;
+            
+            journalService.updateJournalEntry(id, title, content, privateEntry);
+            
+            // Reload the updated entry to show success
+            var updatedEntry = journalService.getJournalEntryById(id);
+            if (updatedEntry.isPresent()) {
+                model.addAttribute("entry", updatedEntry.get());
+                model.addAttribute("success", "Journal entry updated successfully!");
+                return "child/journal-view";
+            }
+            
+            return "redirect:/child/journal";
+        } catch (Exception e) {
+            model.addAttribute("error", "Error updating journal entry: " + e.getMessage());
+            var entry = journalService.getJournalEntryById(id);
+            if (entry.isPresent()) {
+                model.addAttribute("entry", entry.get());
+            }
+            return "child/journal-edit";
+        }
+    }
+
+    /**
+     * DELETE - Handle journal entry deletion
      */
     @PostMapping("/journal/{id}/delete")
     public String deleteJournalEntry(
@@ -207,12 +296,18 @@ public class ChildController {
 
         Integer userId = getLoggedInUserId(session);
 
-        if (!journalService.isJournalEntryOwnedBy(id, userId)) {
-            model.addAttribute("error", "Access denied");
-            return "redirect:/child/journal";
+        try {
+            if (!journalService.isJournalEntryOwnedBy(id, userId)) {
+                model.addAttribute("error", "Access denied");
+                return "redirect:/child/journal";
+            }
+
+            journalService.deleteJournalEntry(id);
+            model.addAttribute("success", "Journal entry deleted successfully!");
+        } catch (Exception e) {
+            model.addAttribute("error", "Error deleting journal entry: " + e.getMessage());
         }
 
-        journalService.deleteJournalEntry(id);
         return "redirect:/child/journal";
     }
 
