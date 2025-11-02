@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood History - FamCare</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏥 FamCare</h1>
+            <div class="nav-links">
+                <span>Welcome, Child!</span>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard">
+            <h1>My Mood History 📈</h1>
+
+            <div class="section">
+                <h2>All Mood Entries</h2>
+                
+                <div th:if="${moodHistory != null and moodHistory.size() > 0}">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Mood Score</th>
+                                <th>Label</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="mood : ${moodHistory}">
+                                <td th:text="${mood.createdAt}"></td>
+                                <td th:text="${mood.moodScore} + '/10'"></td>
+                                <td th:text="${mood.moodLabel}"></td>
+                                <td th:text="${mood.notes != null ? mood.notes : '—'}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:unless="${moodHistory != null and moodHistory.size() > 0}">
+                    <p class="no-data">No mood entries yet. <a href="/child/mood-log">Log your first mood!</a></p>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="action-buttons">
+                <a href="/child/dashboard" class="btn-secondary">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

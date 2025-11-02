@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - FamCare</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏥 FamCare</h1>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/login">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-box">
+            <h2>Create Account</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">
+                Note: Use the <a href="/admin/create-user" style="color: #4CAF50; font-weight: bold;">Admin Panel</a> to create accounts easily!
+            </p>
+
+            <div class="alert alert-error">
+                <p>Please use the Admin Panel to create user accounts. <a href="/admin/create-user">Click here to go to Admin Panel</a></p>
+            </div>
+
+            <div class="action-buttons">
+                <a href="/admin/create-user" class="btn-primary btn-large">Go to Admin Panel</a>
+                <a href="/login" class="btn-secondary btn-large">Back to Login</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

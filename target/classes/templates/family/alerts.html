@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Alerts - FamCare</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .alert-item {
+            border-left: 5px solid #ddd;
+            padding: 15px;
+            margin: 15px 0;
+            background: #fafafa;
+            border-radius: 4px;
+        }
+        .alert-item.critical { border-left-color: #f44336; background: #ffebee; }
+        .alert-item.high { border-left-color: #ff9800; background: #fff3e0; }
+        .alert-item.medium { border-left-color: #fbc02d; background: #fffde7; }
+        .alert-item.low { border-left-color: #4CAF50; background: #f1f8e9; }
+
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .severity-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .severity-critical { background: #ef5350; color: white; }
+        .severity-high { background: #ff9800; color: white; }
+        .severity-medium { background: #fbc02d; color: #333; }
+        .severity-low { background: #66bb6a; color: white; }
+
+        .suggestion-box {
+            background: white;
+            border: 1px solid #2196F3;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 10px;
+            color: #1565c0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏥 FamCare</h1>
+            <div class="nav-links">
+                <span>Family Alerts</span>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard">
+            <div class="back-link">
+                <a href="/family/dashboard">← Back to Dashboard</a>
+            </div>
+
+            <h1>🔔 Intervention Alerts & Recommendations</h1>
+
+            <!-- Error -->
+            <div th:if="${error}" class="alert alert-error">
+                <p th:text="${error}"></p>
+            </div>
+
+            <!-- Alert Summary -->
+            <div class="section">
+                <h2>Alert Summary</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Critical Alerts</h3>
+                        <p class="mood-score" th:text="${criticalCount}"></p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>High Priority</h3>
+                        <p class="mood-score" th:text="${highCount}"></p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Medium Priority</h3>
+                        <p class="mood-score" th:text="${mediumCount}"></p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Low Priority</h3>
+                        <p class="mood-score" th:text="${lowCount}"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerts List -->
+            <div class="section">
+                <h2>All Alerts</h2>
+
+                <div th:if="${alerts != null and alerts.size() > 0}">
+                    <div th:each="alert : ${alerts}" class="alert-item" th:classappend="${alert.severity.toLowerCase()}">
+                        <div class="alert-header">
+                            <div>
+                                <h4 th:text="${alert.message}"></h4>
+                                <small th:text="${alert.childName}"></small>
+                            </div>
+                            <span class="severity-badge" th:classappend="${'severity-' + alert.severity.toLowerCase()}" th:text="${alert.severity}"></span>
+                        </div>
+
+                        <div class="suggestion-box">
+                            <strong>💡 Suggestion:</strong>
+                            <p th:text="${alert.suggestion}"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:unless="${alerts != null and alerts.size() > 0}">
+                    <p style="color: #4CAF50; font-size: 1.1rem; padding: 20px;">
+                        ✅ Great news! No intervention alerts at this time. Your family is doing well!
+                    </p>
+                </div>
+            </div>
+
+            <!-- What to Do -->
+            <div class="section info-section">
+                <h2>📋 What Each Alert Means</h2>
+
+                <h4>🚨 Critical Alerts (Immediate Action)</h4>
+                <p>A family member logged a very low mood (1-2/10). Reach out immediately to offer support and listen without judgment.</p>
+
+                <h4>📉 Declining Trend (High Priority)</h4>
+                <p>Mood has been declining over recent days. Have a calm conversation to understand what's happening and offer help.</p>
+
+                <h4>⚠️ Repeated Low Moods (Medium Priority)</h4>
+                <p>Multiple low mood days detected. Consider suggesting professional support or identifying stressors.</p>
+
+                <h4>🔔 Inactivity (Low Priority)</h4>
+                <p>No mood entries recently. Gently remind them to check in regularly - consistent tracking helps identify patterns.</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="/family/insights" class="btn-primary">View Insights</a>
+                <a href="/family/dashboard" class="btn-secondary">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

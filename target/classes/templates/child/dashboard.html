@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - FamCare</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏥 FamCare</h1>
+            <div class="nav-links">
+                <span>Welcome, Child!</span>
+                <a href="/chat/family">💬 Family Chat</a> 
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard">
+            <h1>My Wellness Dashboard</h1>
+
+            <!-- Quick Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Today's Mood</h3>
+                    <div th:if="${latestMood != null}">
+                        <p class="mood-score" th:text="${latestMood.moodScore} + '/10'"></p>
+                        <p th:text="${moodCategory}"></p>
+                    </div>
+                    <div th:unless="${latestMood != null}">
+                        <p>No mood logged yet</p>
+                    </div>
+                    
+                </div>
+
+                <div class="stat-card">
+                    <h3>Weekly Average</h3>
+                    <p class="mood-score" th:text="${weeklyAverage != null ? #numbers.formatDecimal(weeklyAverage, 1, 1) : '0'}"></p>
+                    <small>Last 7 days</small>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Mood Logs</h3>
+                    <p class="mood-score" th:text="${moodCount}"></p>
+                    <small>Total entries</small>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Journal Entries</h3>
+                    <p class="mood-score" th:text="${journalCount}"></p>
+                    <small th:text="${privateJournalCount} + ' private'"></small>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="/child/mood-log" class="btn-primary">Log Mood 📊</a>
+                <a href="/child/journal" class="btn-primary">Write Journal 📝</a>
+                <a href="/child/mood-history" class="btn-secondary">View History 📈</a>
+                
+
+            </div>
+
+            <!-- Recent Moods -->
+            <div class="section">
+                <h2>Recent Mood Logs (Last 7 Days)</h2>
+                <div th:if="${recentMoods != null and recentMoods.size() > 0}">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Mood Score</th>
+                                <th>Label</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="mood : ${recentMoods}">
+                                <td th:text="${mood.createdAt}"></td>
+                                <td th:text="${mood.moodScore} + '/10'"></td>
+                                <td th:text="${mood.moodLabel}"></td>
+                                <td th:text="${mood.notes != null ? mood.notes : '—'}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div th:unless="${recentMoods != null and recentMoods.size() > 0}">
+                    <p>No moods logged yet. <a href="/child/mood-log">Log your first mood!</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

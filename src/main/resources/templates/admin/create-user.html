@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Create User - FamCare</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏥 FamCare</h1>
+            <div class="nav-links">
+                <a href="/admin/dashboard">Admin Dashboard</a>
+                <a href="/admin/users">All Users</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-box">
+            <h2>⚙️ Admin - Create User</h2>
+
+            <!-- Error message -->
+            <div th:if="${error}" class="alert alert-error">
+                <p th:text="${error}"></p>
+            </div>
+
+            <!-- Success message -->
+            <div th:if="${success}" class="alert alert-success">
+                <p th:text="${success}"></p>
+            </div>
+
+            <!-- Tabs for Parent/Child -->
+            <div class="tabs">
+                <button class="tab-button active" onclick="showTab('parent-tab')">Create Parent</button>
+                <button class="tab-button" onclick="showTab('child-tab')">Create Child</button>
+            </div>
+
+            <!-- Create Parent Form -->
+            <div id="parent-tab" class="tab-content active">
+                <h3>Register New Parent</h3>
+                <form method="POST" th:action="@{/admin/create-parent}" class="form">
+                    <div class="form-group">
+                        <label for="parent-username">Username:</label>
+                        <input type="text" id="parent-username" name="username" required placeholder="e.g., parent1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="parent-password">Password:</label>
+                        <input type="password" id="parent-password" name="password" required placeholder="Enter password">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="parent-email">Email:</label>
+                        <input type="email" id="parent-email" name="email" required placeholder="e.g., parent@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="parent-name">Full Name:</label>
+                        <input type="text" id="parent-name" name="fullName" required placeholder="e.g., John Doe">
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-block">Create Parent Account</button>
+                </form>
+            </div>
+
+            <!-- Create Child Form -->
+            <div id="child-tab" class="tab-content">
+                <h3>Register New Child</h3>
+                <form method="POST" th:action="@{/admin/create-child}" class="form">
+                    <div class="form-group">
+                        <label for="child-username">Username:</label>
+                        <input type="text" id="child-username" name="username" required placeholder="e.g., child1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="child-password">Password:</label>
+                        <input type="password" id="child-password" name="password" required placeholder="Enter password">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="child-email">Email:</label>
+                        <input type="email" id="child-email" name="email" required placeholder="e.g., child@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="child-name">Full Name:</label>
+                        <input type="text" id="child-name" name="fullName" required placeholder="e.g., Sarah Doe">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="parent-id">Parent:</label>
+                        <select id="parent-id" name="parentId" required>
+                            <option value="">Select a parent...</option>
+                            <option th:each="parent : ${parents}" th:value="${parent.id}" th:text="${parent.fullName} + ' (' + ${parent.username} + ')'"></option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-block">Create Child Account</button>
+                </form>
+            </div>
+
+            <div class="form-footer">
+                <a href="/admin/dashboard">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+
+    <style>
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab-button {
+            padding: 12px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-button.active {
+            color: #4CAF50;
+            border-bottom-color: #4CAF50;
+        }
+
+        .tab-button:hover {
+            color: #4CAF50;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-content h3 {
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+    </style>
+</body>
+</html>

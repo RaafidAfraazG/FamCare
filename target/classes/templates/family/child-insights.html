@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Child Insights - FamCare</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .alert-item {
+            border-left: 5px solid #ddd;
+            padding: 15px;
+            margin: 15px 0;
+            background: #fafafa;
+            border-radius: 4px;
+        }
+        .alert-item.critical { border-left-color: #f44336; background: #ffebee; }
+        .alert-item.high { border-left-color: #ff9800; background: #fff3e0; }
+        .alert-item.medium { border-left-color: #fbc02d; background: #fffde7; }
+        .alert-item.low { border-left-color: #4CAF50; background: #f1f8e9; }
+
+        .severity-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .severity-critical { background: #ef5350; color: white; }
+        .severity-high { background: #ff9800; color: white; }
+        .severity-medium { background: #fbc02d; color: #333; }
+        .severity-low { background: #66bb6a; color: white; }
+
+        .suggestion-box {
+            background: white;
+            border: 1px solid #2196F3;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 10px;
+            color: #1565c0;
+        }
+
+        .child-header-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .child-header-section h1 {
+            color: white;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏥 FamCare</h1>
+            <div class="nav-links">
+                <span>Child Insights</span>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard">
+            <div class="back-link">
+                <a href="/family/dashboard">← Back to Family Dashboard</a>
+            </div>
+
+            <!-- Child Header -->
+            <div class="child-header-section" th:if="${child != null}">
+                <h1><span th:text="${child.fullName}"></span> Wellness Insights</h1>
+                <small th:text="'@' + ${child.username}"></small>
+            </div>
+
+            <!-- Error -->
+            <div th:if="${error}" class="alert alert-error">
+                <p th:text="${error}"></p>
+            </div>
+
+            <!-- No Alerts Success -->
+            <div th:if="${alerts != null and alerts.size() == 0}" class="alert alert-success">
+                <p>✅ Great news! No intervention alerts for this child. They're doing well!</p>
+            </div>
+
+            <!-- Alerts -->
+            <div class="section" th:if="${alerts != null and alerts.size() > 0}">
+                <h2>⚠️ Intervention Alerts</h2>
+
+                <div th:each="alert : ${alerts}" class="alert-item" th:classappend="${alert.severity.toLowerCase()}">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                        <div>
+                            <h4 th:text="${alert.message}"></h4>
+                            <p style="margin: 5px 0; color: #666;">
+                                <span th:text="${alert.alertType}"></span>
+                            </p>
+                        </div>
+                        <span class="severity-badge" th:classappend="${'severity-' + alert.severity.toLowerCase()}" th:text="${alert.severity}"></span>
+                    </div>
+
+                    <div class="suggestion-box">
+                        <strong>💡 What to Do:</strong>
+                        <p th:text="${alert.suggestion}"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alert Types Explanation -->
+            <div class="section info-section">
+                <h2>📋 Alert Types Explained</h2>
+
+                <h4>🚨 Critical (Immediate Action Required)</h4>
+                <p>The child logged a very low mood (1-2/10). Reach out immediately to offer support. Listen without judgment and show that you care.</p>
+
+                <h4>📉 Declining Trend (High Priority)</h4>
+                <p>The child's mood has been getting worse recently. Have a calm conversation to understand what's happening. Help identify and address stressors.</p>
+
+                <h4>⚠️ Repeated Low Moods (Medium Priority)</h4>
+                <p>Multiple low mood days detected in the past week. Consider suggesting professional support like counseling or therapy.</p>
+
+                <h4>🔔 Inactivity (Low Priority)</h4>
+                <p>The child hasn't logged moods recently. Gently remind them to check in. Regular tracking helps identify wellness patterns.</p>
+            </div>
+
+            <!-- How to Help -->
+            <div class="section">
+                <h2>💬 How to Support Your Child</h2>
+                <ul>
+                    <li><strong>Listen:</strong> Create a safe space for them to share their feelings without judgment</li>
+                    <li><strong>Ask Questions:</strong> Try "How are you feeling today?" or "What's on your mind?"</li>
+                    <li><strong>Validate:</strong> Acknowledge their emotions as real and important</li>
+                    <li><strong>Plan Together:</strong> Suggest activities that might help lift their mood</li>
+                    <li><strong>Seek Help:</strong> Don't hesitate to involve a professional if needed</li>
+                    <li><strong>Follow Up:</strong> Check in regularly - consistency shows you care</li>
+                </ul>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a th:href="@{/parent/child/{id}/analytics(id=${child.id})}" class="btn-primary">View Analytics</a>
+                <a href="/family/dashboard" class="btn-secondary">Back to Family Dashboard</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

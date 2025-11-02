@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Journal - FamCare</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏥 FamCare</h1>
+            <div class="nav-links">
+                <span>Welcome, Child!</span>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard">
+            <h1>My Journal 📝</h1>
+
+            <!-- Error/Success messages -->
+            <div th:if="${error}" class="alert alert-error">
+                <p th:text="${error}"></p>
+            </div>
+            <div th:if="${success}" class="alert alert-success">
+                <p th:text="${success}"></p>
+            </div>
+
+            <!-- Create New Entry Section -->
+            <div class="section create-entry">
+                <h3>Write a New Entry</h3>
+                <form method="POST" th:action="@{/child/journal}" class="form">
+                    <div class="form-group">
+                        <label for="title">Title:</label>
+                        <input type="text" id="title" name="title" required placeholder="Give your entry a title...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="content">Content:</label>
+                        <textarea id="content" name="content" rows="8" required placeholder="Write your thoughts and feelings..."></textarea>
+                    </div>
+
+                    <div class="form-group checkbox">
+                        <label>
+                            <input type="checkbox" name="isPrivate" value="true" checked>
+                            Keep this entry private (only you can see it)
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Save Entry</button>
+                </form>
+            </div>
+
+            <!-- Journal Entries List -->
+            <div class="section">
+                <h2>Your Entries</h2>
+
+                <div th:if="${journalEntries != null and journalEntries.size() > 0}">
+                    <div th:each="entry : ${journalEntries}" class="journal-card">
+                        <div class="journal-header">
+                            <h4 th:text="${entry.title}"></h4>
+                            <span th:if="${entry.isPrivate}" class="badge badge-private">🔒 Private</span>
+                            <span th:unless="${entry.isPrivate}" class="badge badge-shared">👁️ Shared</span>
+                        </div>
+
+                        <p class="journal-date" th:text="${entry.createdAt}"></p>
+
+                        <p class="journal-excerpt" th:text="${entry.content.length() > 150 ? entry.content.substring(0, 150) + '...' : entry.content}"></p>
+
+                        <div class="journal-actions">
+                            <a th:href="@{/child/journal/{id}(id=${entry.id})}" class="btn-secondary btn-small">View</a>
+                            <form method="POST" th:action="@{/child/journal/{id}/delete(id=${entry.id})}" style="display: inline;">
+                                <button type="submit" class="btn-danger btn-small" onclick="return confirm('Delete this entry?')">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:unless="${journalEntries != null and journalEntries.size() > 0}">
+                    <p class="no-data">No journal entries yet. Start writing above!</p>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="action-buttons">
+                <a href="/child/dashboard" class="btn-secondary">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

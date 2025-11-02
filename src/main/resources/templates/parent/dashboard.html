@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent Dashboard - FamCare</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏥 FamCare</h1>
+            <div class="nav-links">
+                <span>Welcome, Parent!</span>
+                <a href="/chat/family">💬 Family Chat</a>
+                <a href="/family/dashboard">👨‍👩‍👧 Family Wellness</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard">
+            <h1>Parent Dashboard 👨‍👩‍👧</h1>
+
+            <!-- Family Wellness Quick Access -->
+            <div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-left: none;">
+                <h2 style="color: white; margin-top: 0;">👨‍👩‍👧 Family Wellness Center</h2>
+                <p>View family-wide insights, mood trends, and intervention alerts for all members.</p>
+                <div class="action-buttons" style="margin-top: 15px;">
+                    <a href="/family/dashboard" class="btn-primary" style="background: white; color: #667eea;">📊 Go to Family Dashboard</a>
+                    <a href="/family/alerts" class="btn-primary" style="background: #ff6b6b;">🔔 View Alerts</a>
+                    <a href="/family/insights" class="btn-primary" style="background: #4ecdc4;">💡 View Insights</a>
+                </div>
+                
+
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Your Children</h3>
+                    <p class="mood-score" th:text="${childCount}"></p>
+                    <small>Connected accounts</small>
+                </div>
+            </div>
+
+            <!-- Children List -->
+            <div class="section">
+                <h2>Your Children's Wellness</h2>
+
+                <div th:if="${children != null and children.size() > 0}">
+                    <div th:each="child : ${children}" class="child-card">
+                        <div class="child-header">
+                            <h3 th:text="${child.fullName}"></h3>
+                            <small th:text="'@' + ${child.username}"></small>
+                        </div>
+
+                        <div class="child-info">
+                            <p>Email: <span th:text="${child.email}"></span></p>
+                        </div>
+
+                        <div class="child-actions">
+                            <a th:href="@{/parent/child/{id}/analytics(id=${child.id})}" class="btn-primary">View Analytics</a>
+                            <a th:href="@{/parent/child/{id}/mood-chart(id=${child.id})}" class="btn-secondary">View Mood Chart</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:unless="${children != null and children.size() > 0}">
+                    <p class="no-data">No children connected yet. Have them create an account with your ID!</p>
+                </div>
+            </div>
+
+            <!-- Information Section -->
+            <div class="section info-section">
+                <h2>How It Works</h2>
+                <ul>
+                    <li>✅ Your children log their daily mood and write private journal entries</li>
+                    <li>✅ You can view individual mood trends and shared journal entries</li>
+                    <li>✅ Access family-wide insights and intervention alerts</li>
+                    <li>✅ Private entries remain completely private - only they can see</li>
+                    <li>✅ Use insights to have meaningful conversations about their wellness</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔍 Advanced Analytics Section -->
+<div class="section analytics-section">
+    <h2>📈 Advanced Emotional Analytics</h2>
+    <p>AI-powered insights based on your child’s mood and journaling patterns.</p>
+
+    <!-- Dropdown to select a child -->
+    <div>
+        <label for="childSelect"><strong>Select Child:</strong></label>
+        <select id="childSelect">
+            <option value="">-- Choose a Child --</option>
+            <option th:each="child : ${children}" th:value="${child.id}" th:text="${child.fullName}"></option>
+        </select>
+    </div>
+
+    <div id="analyticsResult" class="analytics-result" style="margin-top: 20px;">
+        <p>Select a child to view analytics...</p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const childSelect = document.getElementById("childSelect");
+        const analyticsResult = document.getElementById("analyticsResult");
+
+        childSelect.addEventListener("change", async function() {
+            const childId = this.value;
+            if (!childId) {
+                analyticsResult.innerHTML = "<p>Please select a child.</p>";
+                return;
+            }
+
+            analyticsResult.innerHTML = "<p>Loading analytics...</p>";
+
+            try {
+                const res = await fetch(`/api/analytics/user/${childId}`);
+                if (!res.ok) throw new Error("Failed to fetch analytics");
+                const data = await res.json();
+
+                // Build HTML dynamically
+                analyticsResult.innerHTML = `
+                    <div class="analytics-card">
+                        <h3>Weekly Mood Trend</h3>
+                        <pre>${JSON.stringify(data.weeklyMoodTrend, null, 2)}</pre>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h3>Average Mood Score</h3>
+                        <p><strong>${data.averageMoodScore?.toFixed(2) || "N/A"}</strong></p>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h3>Mood Volatility</h3>
+                        <p>${data.moodVolatility?.toFixed(2) || "N/A"}</p>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h3>Journal Keyword Frequency</h3>
+                        <ul>
+                            ${Object.entries(data.journalKeywordFrequency)
+                                .map(([word, count]) => `<li>${word}: ${count}</li>`)
+                                .join('')}
+                        </ul>
+                    </div>
+
+                    <div class="analytics-card" style="background: #e3f2fd; border-left: 5px solid #1976d2;">
+                        <h3>🧠 Intervention Suggestion</h3>
+                        <p>${data.interventionSuggestion}</p>
+                    </div>
+                `;
+            } catch (error) {
+                analyticsResult.innerHTML = `<p style="color:red;">Error fetching analytics. Please try again later.</p>`;
+                console.error(error);
+            }
+        });
+    });
+</script>
+<!-- 🔮 Advanced AI Analytics Section -->
+<div class="section ai-analytics-section">
+    <h2>🤖 AI-Based Emotional Intelligence Insights</h2>
+    <p>Deeper analysis using stress index, sentiment patterns, and emotional trends.</p>
+
+    <div id="advancedAnalytics" class="analytics-card" style="background: #fff3e0; border-left: 5px solid #ff9800;">
+        <p>Select a child above to view advanced analytics...</p>
+    </div>
+</div>
+
+<script>
+    const advDiv = document.getElementById("advancedAnalytics");
+
+    document.getElementById("childSelect").addEventListener("change", async function () {
+        const childId = this.value;
+        if (!childId) return;
+
+        advDiv.innerHTML = "<p>Loading advanced insights...</p>";
+
+        try {
+            const res = await fetch(`/api/analytics/user/${childId}/advanced`);
+            const data = await res.json();
+
+            const sent = data.sentimentRatio;
+            advDiv.innerHTML = `
+                <h3>🧭 Emotional Trend: ${data.dominantTrend}</h3>
+                <p>🧠 Stress Index: <strong>${data.stressIndex}</strong> / 100</p>
+                <p>😊 Positive Sentiment: ${sent.positivePercent.toFixed(1)}%</p>
+                <p>😟 Negative Sentiment: ${sent.negativePercent.toFixed(1)}%</p>
+                <p style="color:#555;">💡 Suggestion: ${data.baseAnalytics.interventionSuggestion}</p>
+            `;
+        } catch (e) {
+            advDiv.innerHTML = "<p style='color:red;'>Failed to load AI insights.</p>";
+            console.error(e);
+        }
+    });
+</script>
+
+</body>
+</html>

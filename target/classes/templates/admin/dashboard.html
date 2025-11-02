@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - FamCare</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏥 FamCare - Admin Panel</h1>
+            <div class="nav-links">
+                <a href="/admin/create-user">Create User</a>
+                <a href="/">Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard">
+            <h1>⚙️ Admin Dashboard</h1>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Users</h3>
+                    <p class="mood-score" th:text="${totalCount}"></p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Parents</h3>
+                    <p class="mood-score" th:text="${parentCount}"></p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Children</h3>
+                    <p class="mood-score" th:text="${childCount}"></p>
+                </div>
+            </div>
+
+            <!-- Quick Action -->
+            <div class="section">
+                <h2>Quick Actions</h2>
+                <div class="action-buttons">
+                    <a href="/admin/create-user" class="btn-primary">➕ Create New User</a>
+                    <a href="/" class="btn-secondary">🏠 Go Home</a>
+                </div>
+                
+
+            </div>
+
+            <!-- Parents List -->
+            <div class="section">
+                <h2>👨‍💼 Parent Accounts</h2>
+                <div th:if="${parents != null and parents.size() > 0}">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Full Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="parent : ${parents}">
+                                <td th:text="${parent.id}"></td>
+                                <td th:text="${parent.username}"></td>
+                                <td th:text="${parent.email}"></td>
+                                <td th:text="${parent.fullName}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div th:unless="${parents != null and parents.size() > 0}">
+                    <p>No parent accounts yet. <a href="/admin/create-user">Create one</a></p>
+                </div>
+            </div>
+
+            <!-- Children List -->
+            <div class="section">
+                <h2>👧 Child Accounts</h2>
+                <div th:if="${children != null and children.size() > 0}">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Full Name</th>
+                                <th>Parent ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="child : ${children}">
+                                <td th:text="${child.id}"></td>
+                                <td th:text="${child.username}"></td>
+                                <td th:text="${child.email}"></td>
+                                <td th:text="${child.fullName}"></td>
+                                <td th:text="${child.parentId}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div th:unless="${children != null and children.size() > 0}">
+                    <p>No child accounts yet. <a href="/admin/create-user">Create one</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

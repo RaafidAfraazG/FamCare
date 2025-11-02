@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - FamCare</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏥 FamCare</h1>
+            <div class="nav-links">
+                <span>Welcome, Parent!</span>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard">
+            <div class="back-link">
+                <a href="/parent/dashboard">← Back to Dashboard</a>
+            </div>
+
+            <h1 th:text="${child != null ? child.fullName + &quot; Wellness Analytics&quot; : 'Analytics'}"></h1>
+
+            <!-- Error message -->
+            <div th:if="${error}" class="alert alert-error">
+                <p th:text="${error}"></p>
+            </div>
+
+            <!-- Analytics Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Weekly Average Mood</h3>
+                    <p class="mood-score" th:text="${weeklyAverage != null ? #numbers.formatDecimal(weeklyAverage, 1, 1) : '0'}"></p>
+                    <small>Last 7 days</small>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Monthly Average Mood</h3>
+                    <p class="mood-score" th:text="${monthlyAverage != null ? #numbers.formatDecimal(monthlyAverage, 1, 1) : '0'}"></p>
+                    <small>Last 30 days</small>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Total Mood Logs</h3>
+                    <p class="mood-score" th:text="${moodCount}"></p>
+                    <small>All time</small>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Journal Entries</h3>
+                    <p class="mood-score" th:text="${journalCount}"></p>
+                    <small th:text="${sharedJournalCount} + ' shared'"></small>
+                </div>
+            </div>
+
+            <!-- Recent Moods -->
+            <div class="section">
+                <h2>Recent Mood Logs (Last 7 Days)</h2>
+                <div th:if="${recentMoods != null and recentMoods.size() > 0}">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Score</th>
+                                <th>Mood</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="mood : ${recentMoods}">
+                                <td th:text="${mood.createdAt}"></td>
+                                <td th:text="${mood.moodScore} + '/10'"></td>
+                                <td th:text="${mood.moodLabel}"></td>
+                                <td th:text="${mood.notes != null ? mood.notes : '—'}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div th:unless="${recentMoods != null and recentMoods.size() > 0}">
+                    <p>No recent mood logs.</p>
+                </div>
+            </div>
+
+            <!-- Shared Journal Entries -->
+            <div class="section">
+                <h2>Shared Journal Entries</h2>
+                <div th:if="${sharedJournals != null and sharedJournals.size() > 0}">
+                    <div th:each="journal : ${sharedJournals}" class="journal-card">
+                        <div class="journal-header">
+                            <h4 th:text="${journal.title}"></h4>
+                            <span class="badge badge-shared">👁️ Shared</span>
+                        </div>
+                        <p class="journal-date" th:text="${journal.createdAt}"></p>
+                        <p class="journal-excerpt" th:text="${journal.content.length() > 200 ? journal.content.substring(0, 200) + '...' : journal.content}"></p>
+                        <div class="journal-actions">
+                            <a th:href="@{/parent/child/{childId}/journal/{journalId}(childId=${child.id}, journalId=${journal.id})}" class="btn-secondary btn-small">Read Full Entry</a>
+                        </div>
+                    </div>
+                </div>
+                <div th:unless="${sharedJournals != null and sharedJournals.size() > 0}">
+                    <p>No shared journal entries yet.</p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a th:href="@{/parent/child/{id}/mood-chart(id=${child.id})}" class="btn-primary">View Mood Chart</a>
+                <a href="/parent/dashboard" class="btn-secondary">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

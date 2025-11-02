@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FamCare - Family Mental Health Tracker</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏥 FamCare</h1>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/login" class="btn-primary">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero">
+            <h1>Welcome to FamCare</h1>
+            <p>A private, secure family mental wellness tracking app</p>
+            
+            <div class="hero-content">
+                <div class="feature-box">
+                    <h3>👨‍👩‍👧 For Families</h3>
+                    <p>Parents can monitor their children's mental wellness journey safely and supportively.</p>
+                </div>
+
+                <div class="feature-box">
+                    <h3>📊 Track Mood Daily</h3>
+                    <p>Log your mood and emotions with detailed notes for better self-awareness.</p>
+                </div>
+
+                <div class="feature-box">
+                    <h3>📝 Private Journal</h3>
+                    <p>Write personal journal entries and control what you share with parents.</p>
+                </div>
+
+                <div class="feature-box">
+                    <h3>📈 Analytics</h3>
+                    <p>Parents see trends and patterns to better support their children's wellness.</p>
+                </div>
+            </div>
+
+            <div class="cta-buttons">
+                <a href="/login" class="btn-primary btn-large">Login to Your Account</a>
+                <a href="/register" class="btn-secondary btn-large">Create Account</a>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 FamCare - Mental Health Tracking. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

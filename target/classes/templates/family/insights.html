@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Insights - FamCare</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏥 FamCare</h1>
+            <div class="nav-links">
+                <span>Family Insights</span>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard">
+            <div class="back-link">
+                <a href="/family/dashboard">← Back to Dashboard</a>
+            </div>
+
+            <h1>📊 Family Wellness Insights</h1>
+
+            <!-- Overall Summary -->
+            <div class="section">
+                <h2>Overall Family Summary</h2>
+                
+                <div th:if="${insights != null}">
+                    <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                        <p><strong>Family Average Mood:</strong> <span th:text="${#numbers.formatDecimal(insights.familyAverageMood, 1, 1)}"></span>/10</p>
+                        <p><strong>Status:</strong> <span th:text="${insights.familyWellnessStatus}"></span></p>
+                        <p><strong>Trend:</strong> <span th:text="${insights.trend}"></span></p>
+                        <p><strong>Dominant Mood:</strong> <span th:text="${insights.dominantMood}"></span></p>
+                    </div>
+
+                    <h3>Key Recommendation</h3>
+                    <div style="background: #e3f2fd; padding: 15px; border-left: 4px solid #2196F3; border-radius: 4px;">
+                        <p th:text="${insights.recommendation}"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Individual Analysis -->
+            <div class="section">
+                <h2>Individual Member Analysis</h2>
+
+                <div th:if="${trends != null and trends.size() > 0}">
+                    <div th:each="trend : ${trends}" style="background: white; border: 1px solid #ddd; padding: 20px; margin: 15px 0; border-radius: 8px;">
+                        <h3 th:text="${trend.userName}"></h3>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0;">
+                            <div>
+                                <p><strong>Weekly Average:</strong> <span th:text="${#numbers.formatDecimal(trend.weeklyAverage, 1, 1)}"></span>/10</p>
+                                <p><strong>Monthly Average:</strong> <span th:text="${#numbers.formatDecimal(trend.monthlyAverage, 1, 1)}"></span>/10</p>
+                            </div>
+                            <div>
+                                <p><strong>Trend:</strong> <span th:text="${trend.trend}"></span></p>
+                                <p><strong>Good Days (Last 7d):</strong> <span th:text="${trend.highMoodDays}"></span></p>
+                                <p><strong>Low Days (Last 7d):</strong> <span th:text="${trend.lowMoodDays}"></span></p>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 15px;">
+                            <a th:href="@{/family/child/{id}/insights(id=${trend.userId})}" class="btn-secondary btn-small">View Child Insights</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:unless="${trends != null and trends.size() > 0}">
+                    <p>No member data available yet.</p>
+                </div>
+            </div>
+
+            <!-- Wellness Tips -->
+            <div class="section info-section">
+                <h2>💡 Wellness Tips for Families</h2>
+                <ul>
+                    <li>✅ Have regular check-ins with family members about their emotions</li>
+                    <li>✅ Plan family activities to boost overall mood</li>
+                    <li>✅ Create a supportive environment where feelings are validated</li>
+                    <li>✅ Monitor patterns - recurring low moods may indicate underlying issues</li>
+                    <li>✅ Celebrate good mood days and positive trends</li>
+                    <li>✅ Encourage open communication about stressors</li>
+                    <li>✅ Consider professional support for persistent low moods</li>
+                </ul>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="/family/alerts" class="btn-primary">View Alerts</a>
+                <a href="/family/dashboard" class="btn-secondary">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
