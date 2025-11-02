@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Doctors - FamCare</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: #fdfefe;
+            color: #1a1a1a;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark-theme {
+            background: linear-gradient(135deg, #1a1c2e 0%, #2a1a3d 100%);
+            color: #e2e8f0;
+        }
+
+        /* Background Animation */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .gradient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.18;
+            animation: float-elegant 25s infinite ease-in-out;
+        }
+
+        body.dark-theme .gradient-orb {
+            filter: blur(100px);
+            opacity: 0.15;
+        }
+
+        .orb1 {
+            width: 450px;
+            height: 450px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            top: -8%;
+            left: -8%;
+        }
+
+        .orb2 {
+            width: 350px;
+            height: 350px;
+            background: linear-gradient(135deg, #ec4899 0%, #f97316 100%);
+            bottom: -4%;
+            right: -4%;
+            animation-delay: 8s;
+        }
+
+        .orb3 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: 4s;
+        }
+
+        @keyframes float-elegant {
+            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.18; }
+            33% { transform: translate(40px, -40px) scale(1.08); opacity: 0.22; }
+            66% { transform: translate(-25px, 25px) scale(0.92); opacity: 0.14; }
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(99, 102, 241, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.025) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: grid-move 20s linear infinite;
+        }
+
+        @keyframes grid-move {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 16px 0;
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.07);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-theme .navbar {
+            background: rgba(30, 32, 52, 0.9);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .navbar .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .logo {
+            color: #f1f5f9;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-theme .nav-links a {
+            color: #cbd5e1;
+        }
+
+        .nav-links a:hover {
+            color: #6366f1;
+        }
+
+        .theme-toggle {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1.5px solid rgba(99, 102, 241, 0.2);
+            color: #6366f1;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(99, 102, 241, 0.15);
+        }
+
+        body.dark-theme .theme-toggle {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+            color: #a5b4fc;
+        }
+
+        /* Container */
+        .container-main {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            letter-spacing: -1.5px;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme h1 {
+            color: #f9fafb;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #64748b;
+            margin-bottom: 40px;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .subtitle {
+            color: #cbd5e1;
+        }
+
+        /* Info Banner */
+        .info-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 24px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        body.dark-theme .info-banner {
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.2);
+        }
+
+        .info-banner-icon {
+            font-size: 32px;
+        }
+
+        .info-banner-text p {
+            margin: 4px 0;
+            opacity: 0.95;
+        }
+
+        /* Doctors List */
+        .doctors-section h2 {
+            font-size: 26px;
+            margin-bottom: 24px;
+            color: #1a1a1a;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .doctors-section h2 {
+            color: #f1f5f9;
+        }
+
+        .doctor-card {
+            background: #ffffff;
+            padding: 28px;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 18px;
+            transition: all 0.35s ease;
+        }
+
+        body.dark-theme .doctor-card {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+        }
+
+        body.dark-theme .doctor-card:hover {
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6);
+        }
+
+        .doctor-header {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        body.dark-theme .doctor-header {
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .doctor-header h3 {
+            font-size: 22px;
+            color: #1a1a1a;
+            margin: 0 0 8px 0;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .doctor-header h3 {
+            color: #f1f5f9;
+        }
+
+        .doctor-spec {
+            display: inline-block;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .doctor-info {
+            display: grid;
+            gap: 14px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(99, 102, 241, 0.04);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-theme .info-item {
+            background: rgba(99, 102, 241, 0.08);
+        }
+
+        .info-item:hover {
+            background: rgba(99, 102, 241, 0.08);
+        }
+
+        body.dark-theme .info-item:hover {
+            background: rgba(99, 102, 241, 0.12);
+        }
+
+        .info-icon {
+            font-size: 20px;
+            min-width: 24px;
+        }
+
+        .info-content {
+            flex: 1;
+        }
+
+        .info-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #94a3b8;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 15px;
+            color: #1a1a1a;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .info-value {
+            color: #e2e8f0;
+        }
+
+        .info-value a {
+            color: #6366f1;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .info-value a:hover {
+            color: #4f46e5;
+            text-decoration: underline;
+        }
+
+        body.dark-theme .info-value a {
+            color: #a5b4fc;
+        }
+
+        body.dark-theme .info-value a:hover {
+            color: #ffffff;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 60px 40px;
+            color: #94a3b8;
+            font-style: italic;
+            background: #f9f9f9;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-theme .no-data {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .no-data-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .container-main {
+                padding: 30px 24px;
+            }
+
+            h1 {
+                font-size: 32px;
+            }
+
+            .info-banner {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .doctor-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="gradient-orb orb1"></div>
+        <div class="gradient-orb orb2"></div>
+        <div class="gradient-orb orb3"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="/child/dashboard" class="logo">
+                <span>🏥</span>
+                <span>FamCare</span>
+            </a>
+            <div class="nav-links">
+                <a href="/child/dashboard">Dashboard</a>
+                <a href="/chat/family">Chat</a>
+                <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">
+                    <span id="themeIcon">🌙</span>
+                </button>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-main">
+        <h1>👨‍⚕️ Family Doctors</h1>
+        <p class="subtitle">Contact information for your family's healthcare providers</p>
+
+        <!-- Info Banner -->
+        <div class="info-banner">
+            <div class="info-banner-icon">💡</div>
+            <div class="info-banner-text">
+                <p><strong>Quick Access</strong></p>
+                <p>Your parents have added these doctors for easy access when you need medical assistance.</p>
+            </div>
+        </div>
+
+        <!-- Doctors List -->
+        <div class="doctors-section">
+            <h2>Available Doctors (<span th:text="${doctorCount}">0</span>)</h2>
+
+            <div th:if="${doctors != null and doctors.size() > 0}">
+                <div th:each="doctor : ${doctors}" class="doctor-card">
+                    <div class="doctor-header">
+                        <h3 th:text="${doctor.name}">Dr. John Smith</h3>
+                        <span th:if="${doctor.specialization != null and doctor.specialization != ''}" 
+                              class="doctor-spec" 
+                              th:text="${doctor.specialization}">General Physician</span>
+                    </div>
+
+                    <div class="doctor-info">
+                        <div class="info-item">
+                            <div class="info-icon">📱</div>
+                            <div class="info-content">
+                                <div class="info-label">Mobile Number</div>
+                                <div class="info-value">
+                                    <a th:href="'tel:' + ${doctor.mobileNumber}" th:text="${doctor.mobileNumber}">+1 234 567 8900</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div th:if="${doctor.email != null and doctor.email != ''}" class="info-item">
+                            <div class="info-icon">📧</div>
+                            <div class="info-content">
+                                <div class="info-label">Email Address</div>
+                                <div class="info-value">
+                                    <a th:href="'mailto:' + ${doctor.email}" th:text="${doctor.email}">doctor@example.com</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div th:if="${doctor.address != null and doctor.address != ''}" class="info-item">
+                            <div class="info-icon">📍</div>
+                            <div class="info-content">
+                                <div class="info-label">Clinic Location</div>
+                                <div class="info-value" th:text="${doctor.address}">123 Medical Center, City, State</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:unless="${doctors != null and doctors.size() > 0}">
+                <div class="no-data">
+                    <div class="no-data-icon">🩺</div>
+                    <p>No doctors have been added yet.</p>
+                    <p>Ask your parents to add family doctors for easy access!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme Toggle
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+            document.getElementById('themeIcon').textContent = '☀️';
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            
+            body.classList.toggle('dark-theme');
+            
+            if (body.classList.contains('dark-theme')) {
+                themeIcon.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeIcon.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+    </script>
+</body>
+</html>

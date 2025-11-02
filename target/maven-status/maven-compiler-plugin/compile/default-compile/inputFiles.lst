@@ -5,16 +5,19 @@ C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\model\MoodEntry.ja
 C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\model\User.java
 C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\config\SecurityConfig.java
 C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\controller\ChildController.java
+C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\model\FamilyDoctor.java
 C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\service\AuthService.java
 C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\controller\AdminController.java
 C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\repository\UserRepository.java
 C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\model\JournalEntry.java
 C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\service\SentimentAnalysisService.java
+C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\controller\DoctorController.java
 C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\util\PasswordEncoder.java
 C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\service\FamilyInsightService.java
 C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\controller\ParentController.java
 C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\repository\MoodEntryRepository.java
 C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\controller\FamilyController.java
+C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\service\FamilyDoctorService.java
 C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\repository\JournalEntryRepository.java
 C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\service\InterventionService.java
 C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\service\MoodService.java
@@ -24,4 +27,5 @@ C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\service\ChatServic
 C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\repository\ChatMessageRepository.java
 C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\FamcareApplication.java
 C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\controller\AuthController.java
+C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\repository\FamilyDoctorRepository.java
 C:\Users\Raafid\Desktop\famcare-app\src\main\java\com\famcare\model\FamilyInsight.java
