@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Journal - FamCare</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #667eea;
+        }
+        
+        .edit-form {
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+        
+        .form-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #f0f0f0;
+        }
+        
+        .form-header h2 {
+            color: #333;
+            font-size: 28px;
+            margin: 0;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            color: #0066cc;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 15px;
+        }
+        
+        .form-group input[type="text"],
+        .form-group textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+        
+        .form-group input[type="text"]:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-group textarea {
+            min-height: 300px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+        
+        .checkbox-group:hover {
+            background: #f0f1f3;
+            border-color: #667eea;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+        
+        .checkbox-group label {
+            margin: 0 !important;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .char-count {
+            text-align: right;
+            font-size: 13px;
+            color: #666;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 35px;
+        }
+        
+        .btn {
+            padding: 14px 35px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(108, 117, 125, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .edit-form {
+                margin: 20px;
+                padding: 25px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏥 FamCare</h1>
+            <div class="nav-links">
+                <a href="/child/dashboard">Dashboard</a>
+                <a href="/child/journal">My Journal</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="edit-form">
+        <!-- Error messages -->
+        <div th:if="${error}" class="alert alert-error">
+            <p th:text="${error}"></p>
+        </div>
+
+        <div class="info-box">
+            ℹ️ You're editing your journal entry. Your changes will be saved automatically.
+        </div>
+
+        <div class="form-header">
+            <h2>✏️ Edit Your Journal Entry</h2>
+        </div>
+
+        <form method="POST" th:action="@{/child/journal/{id}/update(id=${journal.id})}" id="editForm">
+            <div class="form-group">
+                <label for="title">📝 Title:</label>
+                <input type="text" id="title" name="title" 
+                       th:value="${journal.title}" 
+                       required 
+                       maxlength="200"
+                       placeholder="Enter your journal title...">
+                <div class="char-count">
+                    <span id="titleCount">0</span>/200 characters
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="content">📄 What's on your mind?</label>
+                <textarea id="content" name="content" 
+                          required 
+                          placeholder="Write your thoughts and feelings..."
+                          th:text="${journal.content}"></textarea>
+                <div class="char-count">
+                    <span id="contentCount">0</span> characters
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="isPrivate" name="isPrivate" 
+                           value="true" th:checked="${journal.isPrivate}">
+                    <label for="isPrivate">
+                        🔒 Keep this entry private (Only you can see this)
+                    </label>
+                </div>
+                <p style="font-size: 13px; color: #666; margin-top: 10px; margin-left: 34px;">
+                    Uncheck if you want to share this entry with your parent
+                </p>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">
+                    💾 Save Changes
+                </button>
+                <a href="/child/journal" class="btn btn-secondary">
+                    ❌ Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Character counter for title
+        const titleInput = document.getElementById('title');
+        const titleCount = document.getElementById('titleCount');
+        
+        function updateTitleCount() {
+            const length = titleInput.value.length;
+            titleCount.textContent = length;
+            
+            // Change color based on length
+            if (length > 180) {
+                titleCount.style.color = '#dc3545';
+                titleCount.style.fontWeight = 'bold';
+            } else if (length > 150) {
+                titleCount.style.color = '#ff9800';
+            } else {
+                titleCount.style.color = '#666';
+                titleCount.style.fontWeight = '500';
+            }
+        }
+        
+        titleInput.addEventListener('input', updateTitleCount);
+        updateTitleCount();
+
+        // Character counter for content
+        const contentInput = document.getElementById('content');
+        const contentCount = document.getElementById('contentCount');
+        
+        function updateContentCount() {
+            contentCount.textContent = contentInput.value.length;
+        }
+        
+        contentInput.addEventListener('input', updateContentCount);
+        updateContentCount();
+
+        // Warn before leaving with unsaved changes
+        let formChanged = false;
+        let originalTitle = titleInput.value;
+        let originalContent = contentInput.value;
+        
+        const form = document.getElementById('editForm');
+        
+        form.addEventListener('input', () => {
+            formChanged = (titleInput.value !== originalTitle || contentInput.value !== originalContent);
+        });
+        
+        window.addEventListener('beforeunload', (e) => {
+            if (formChanged) {
+                e.preventDefault();
+                e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+            }
+        });
+        
+        form.addEventListener('submit', () => {
+            formChanged = false;
+        });
+
+        // Auto-save draft to localStorage (optional enhancement)
+        let autoSaveTimer;
+        
+        function autoSaveDraft() {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                if (formChanged) {
+                    const draft = {
+                        title: titleInput.value,
+                        content: contentInput.value,
+                        timestamp: new Date().toISOString()
+                    };
+                    localStorage.setItem('journal_draft_' + '${journal.id}', JSON.stringify(draft));
+                    console.log('Draft auto-saved');
+                }
+            }, 2000); // Save after 2 seconds of inactivity
+        }
+        
+        titleInput.addEventListener('input', autoSaveDraft);
+        contentInput.addEventListener('input', autoSaveDraft);
+        
+        // Load draft on page load
+        window.addEventListener('load', () => {
+            const savedDraft = localStorage.getItem('journal_draft_' + '${journal.id}');
+            if (savedDraft) {
+                const draft = JSON.parse(savedDraft);
+                const draftAge = (new Date() - new Date(draft.timestamp)) / 1000 / 60; // minutes
+                
+                if (draftAge < 60) { // Only restore if less than 1 hour old
+                    if (confirm('Found an auto-saved draft from ' + Math.round(draftAge) + ' minutes ago. Restore it?')) {
+                        titleInput.value = draft.title;
+                        contentInput.value = draft.content;
+                        updateTitleCount();
+                        updateContentCount();
+                    }
+                }
+            }
+        });
+        
+        // Clear draft on successful submit
+        form.addEventListener('submit', () => {
+            localStorage.removeItem('journal_draft_' + '${journal.id}');
+        });
+    </script>
+</body>
+</html>

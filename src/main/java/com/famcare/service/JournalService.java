@@ -4,9 +4,11 @@ import com.famcare.model.JournalEntry;
 import com.famcare.repository.JournalEntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class JournalService {
@@ -16,23 +18,35 @@ public class JournalService {
 
     /**
      * Create a new journal entry
-     * 
-     * @param userId - ID of the user writing the journal
-     * @param title - journal entry title
-     * @param content - journal entry content
-     * @param isPrivate - true if private (only child sees), false if shareable (parent can see)
      */
-    public void createJournalEntry(Integer userId, String title, String content, Boolean isPrivate) {
-        // Validate input
-        if (title == null || title.trim().isEmpty()) {
-            throw new IllegalArgumentException("Title cannot be empty");
-        }
-        if (content == null || content.trim().isEmpty()) {
-            throw new IllegalArgumentException("Content cannot be empty");
-        }
+    @Transactional
+    public JournalEntry createJournalEntry(Integer userId, String title, String content, Boolean isPrivate) {
+        JournalEntry entry = new JournalEntry(userId, title, content, isPrivate);
+        return journalEntryRepository.save(entry);
+    }
 
-        JournalEntry journalEntry = new JournalEntry(userId, title, content, isPrivate);
-        journalEntryRepository.save(journalEntry);
+    /**
+     * Update an existing journal entry
+     */
+    @Transactional
+    public JournalEntry updateJournalEntry(Integer journalId, String title, String content, Boolean isPrivate) {
+        JournalEntry entry = journalEntryRepository.findById(journalId)
+            .orElseThrow(() -> new RuntimeException("Journal entry not found"));
+        
+        entry.setTitle(title);
+        entry.setContent(content);
+        entry.setIsPrivate(isPrivate);
+        entry.setUpdatedAt(LocalDateTime.now());
+        
+        return journalEntryRepository.save(entry);
+    }
+
+    /**
+     * Get a single journal entry by ID
+     */
+    public JournalEntry getJournalEntryById(Integer journalId) {
+        return journalEntryRepository.findById(journalId)
+            .orElseThrow(() -> new RuntimeException("Journal entry not found"));
     }
 
     /**
@@ -43,103 +57,86 @@ public class JournalService {
     }
 
     /**
-     * Get only private journal entries for a user (child's personal entries)
-     */
-    public List<JournalEntry> getPrivateJournalEntries(Integer userId) {
-        return journalEntryRepository.findPrivateByUserId(userId);
-    }
-
-    /**
-     * Get shareable journal entries for a user (parent can view)
+     * Get shared journal entries (visible to parents)
      */
     public List<JournalEntry> getSharedJournalEntries(Integer userId) {
         return journalEntryRepository.findSharedByUserId(userId);
     }
 
     /**
-     * Get a specific journal entry
+     * Get private journal entries (only child can see)
      */
-    public Optional<JournalEntry> getJournalEntryById(Integer id) {
-        return journalEntryRepository.findById(id);
-    }
-
-    /**
-     * Update a journal entry
-     */
-    public void updateJournalEntry(Integer id, String title, String content, Boolean isPrivate) {
-        Optional<JournalEntry> optionalEntry = journalEntryRepository.findById(id);
-        
-        if (optionalEntry.isEmpty()) {
-            throw new IllegalArgumentException("Journal entry not found");
-        }
-
-        JournalEntry journalEntry = optionalEntry.get();
-        journalEntry.setTitle(title);
-        journalEntry.setContent(content);
-        journalEntry.setIsPrivate(isPrivate);
-
-        journalEntryRepository.update(journalEntry);
+    public List<JournalEntry> getPrivateJournalEntries(Integer userId) {
+        return journalEntryRepository.findPrivateByUserId(userId);
     }
 
     /**
      * Delete a journal entry
      */
-    public void deleteJournalEntry(Integer id) {
-        journalEntryRepository.deleteById(id);
+    @Transactional
+    public void deleteJournalEntry(Integer journalId) {
+        journalEntryRepository.deleteById(journalId);
     }
 
     /**
-     * Get journal entries from last N days
+     * Get journal entry count
      */
-    public List<JournalEntry> getJournalEntriesLastNDays(Integer userId, int days) {
-        return journalEntryRepository.findByUserIdLastNDays(userId, days);
-    }
-
-    /**
-     * Get journal entry count for a user
-     */
-    public int getJournalEntryCount(Integer userId) {
+    public Integer getJournalEntryCount(Integer userId) {
         return journalEntryRepository.countByUserId(userId);
     }
 
     /**
-     * Get private journal entry count
+     * Get shared journal count
      */
-    public int getPrivateJournalEntryCount(Integer userId) {
-        return getPrivateJournalEntries(userId).size();
+    public Integer getSharedJournalEntryCount(Integer userId) {
+        List<JournalEntry> shared = journalEntryRepository.findSharedByUserId(userId);
+        return shared.size();
     }
 
     /**
-     * Get shared journal entry count
+     * Get private journal count
      */
-    public int getSharedJournalEntryCount(Integer userId) {
-        return getSharedJournalEntries(userId).size();
+    public Integer getPrivateJournalEntryCount(Integer userId) {
+        List<JournalEntry> privateEntries = journalEntryRepository.findPrivateByUserId(userId);
+        return privateEntries.size();
     }
 
     /**
-     * Check if a journal entry belongs to a user
+     * Get journals from last N days
      */
-    public boolean isJournalEntryOwnedBy(Integer journalId, Integer userId) {
-        Optional<JournalEntry> optionalEntry = journalEntryRepository.findById(journalId);
+    public List<JournalEntry> getUserJournalEntriesLastNDays(Integer userId, int days) {
+        return journalEntryRepository.findByUserIdLastNDays(userId, days);
+    }
+
+    /**
+     * Advanced search with filters
+     */
+    public List<JournalEntry> searchJournalsWithFilters(Integer userId, String keyword,
+                                                         Boolean isPrivate, 
+                                                         LocalDate startDate, 
+                                                         LocalDate endDate) {
+        LocalDateTime start = startDate != null ? startDate.atStartOfDay() : null;
+        LocalDateTime end = endDate != null ? endDate.atTime(23, 59, 59) : null;
         
-        if (optionalEntry.isEmpty()) {
-            return false;
-        }
-
-        return optionalEntry.get().getUserId().equals(userId);
+        return journalEntryRepository.searchWithFilters(userId, keyword, start, end, isPrivate);
     }
 
     /**
-     * Check if parent can view a child's journal entry
+     * Search user's journals by keyword
      */
-    public boolean canParentViewEntry(Integer journalId) {
-        Optional<JournalEntry> optionalEntry = journalEntryRepository.findById(journalId);
-        
-        if (optionalEntry.isEmpty()) {
-            return false;
-        }
+    public List<JournalEntry> searchUserJournals(Integer userId, String keyword) {
+        return searchJournalsWithFilters(userId, keyword, null, null, null);
+    }
 
-        // Parent can only view shared (non-private) entries
-        return !optionalEntry.get().getIsPrivate();
+    /**
+     * Get recent journal entries
+     */
+    public List<JournalEntry> getRecentJournalEntries(Integer userId, int limit) {
+        return journalEntryRepository.findRecentByUserId(userId, limit);
+    }
+
+    public boolean isJournalEntryOwnedBy(Integer id, Integer userId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isJournalEntryOwnedBy'");
     }
 }

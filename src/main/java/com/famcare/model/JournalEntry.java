@@ -7,9 +7,12 @@ public class JournalEntry {
     private Integer userId;
     private String title;
     private String content;
-    private Boolean isPrivate; // true = only child can see, false = parent can see summary
+    private Boolean isPrivate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    
+    // Transient field for displaying user info (not stored in DB)
+    private User user;
 
     // Constructors
     public JournalEntry() {
@@ -79,6 +82,14 @@ public class JournalEntry {
         this.updatedAt = updatedAt;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Override
     public String toString() {
         return "JournalEntry{" +
@@ -87,6 +98,22 @@ public class JournalEntry {
                 ", title='" + title + '\'' +
                 ", isPrivate=" + isPrivate +
                 ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 '}';
+    }
+
+    public Object getMoodScore() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getMoodScore'");
+    }
+
+    public boolean isEmpty() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isEmpty'");
+    }
+
+    public JournalEntry get() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'get'");
     }
 }

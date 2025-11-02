@@ -135,11 +135,4 @@ public class AuthController {
         session.invalidate(); // Clear session
         return "redirect:/";
     }
-
-    /**
-     * Check if user is logged in (helper method)
-     */
-    private boolean isLoggedIn(HttpSession session) {
-        return session.getAttribute("userId") != null;
-    }
 }

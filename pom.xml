@@ -2,6 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.famcare</groupId>
@@ -45,19 +46,40 @@
             <version>42.7.1</version>
         </dependency>
 
-        <!-- Spring JDBC (for manual SQL) -->
+        <!-- Spring JDBC -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
 
-        <!-- Spring Security (for login/authentication) -->
+        <!-- Spring Security -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
-        <!-- For development/testing -->
+        <!-- Swagger/OpenAPI for REST API Documentation -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+
+        <!-- PDF Export (iText) -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itextpdf</artifactId>
+            <version>5.5.13.3</version>
+        </dependency>
+
+        <!-- Apache POI for Excel Export -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.2.3</version>
+        </dependency>
+
+        <!-- Testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -73,4 +95,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

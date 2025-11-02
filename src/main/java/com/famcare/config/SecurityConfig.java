@@ -20,24 +20,36 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
+            .csrf(csrf -> csrf.disable()) // Simplified for demo
             .authorizeHttpRequests(authz -> authz
-                // Allow all admin routes
-                .requestMatchers("/admin", "/admin/**").permitAll()
+                // Public pages
+                .requestMatchers("/", "/index", "/login", "/register", "/register/**").permitAll()
                 
-                // Allow static files
-                .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                // Static resources
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/fonts/**").permitAll()
                 
-                // Allow public pages
-                .requestMatchers("/", "/index", "/login", "/register", "/register/parent", "/register/child").permitAll()
+                // Swagger UI (for API documentation demo)
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 
-                // Allow all other requests
-                .anyRequest().permitAll()
+                // Protected pages (simple check - you handle role-based in controllers)
+                .requestMatchers("/admin/**", "/parent/**", "/child/**").authenticated()
+                
+                // API endpoints
+                .requestMatchers("/api/**").authenticated()
+                
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form
+                .loginPage("/login")
+                .defaultSuccessUrl("/", true)
+                .permitAll()
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
+                .logoutSuccessUrl("/login?logout=true")
                 .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .permitAll()
             );
 
         return http.build();

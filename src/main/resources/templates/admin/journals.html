@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Journals - FamCare Admin</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .page-header h1 {
+            color: #333;
+            margin: 0 0 10px 0;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .stat-item {
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .journal-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .journal-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        .journal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+        
+        .journal-header h3 {
+            color: #333;
+            margin: 0;
+            flex: 1;
+        }
+        
+        .badge {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .badge-private {
+            background: #ffe0e0;
+            color: #c33;
+        }
+        
+        .badge-shared {
+            background: #e0f0ff;
+            color: #0066cc;
+        }
+        
+        .meta-info {
+            display: flex;
+            gap: 20px;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .journal-excerpt {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+            color: #666;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏥 FamCare Admin</h1>
+            <div class="nav-links">
+                <a href="/admin/dashboard">Dashboard</a>
+                <a href="/admin/users">Users</a>
+                <a href="/admin/journals">Journals</a>
+                <a href="/admin/moods">Moods</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Success/Error Messages -->
+        <div th:if="${success}" class="alert alert-success">
+            <p th:text="${success}"></p>
+        </div>
+        
+        <div th:if="${error}" class="alert alert-error">
+            <p th:text="${error}"></p>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>📝 All Journal Entries</h1>
+            <div class="stats">
+                <div class="stat-item">
+                    📊 Total: <span th:text="${totalJournals}">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Journal List -->
+        <div th:if="${journals != null and journals.size() > 0}">
+            <div th:each="journal : ${journals}" class="journal-card">
+                <div class="journal-header">
+                    <h3 th:text="${journal.title}">Journal Title</h3>
+                    <span th:if="${journal.isPrivate}" class="badge badge-private">🔒 Private</span>
+                    <span th:unless="${journal.isPrivate}" class="badge badge-shared">👁️ Shared</span>
+                </div>
+
+                <div class="meta-info">
+                    <div class="meta-item">
+                        <span>👤</span>
+                        <span th:text="${journal.user != null ? journal.user.fullName : 'Unknown User'}"></span>
+                    </div>
+                    <div class="meta-item">
+                        <span>📅</span>
+                        <span th:text="${#temporals.format(journal.createdAt, 'MMM dd, yyyy HH:mm')}"></span>
+                    </div>
+                    <div class="meta-item" th:if="${journal.updatedAt != null}">
+                        <span>🔄</span>
+                        <span th:text="'Updated: ' + ${#temporals.format(journal.updatedAt, 'MMM dd, yyyy HH:mm')}"></span>
+                    </div>
+                </div>
+
+                <p class="journal-excerpt" 
+                   th:text="${journal.content.length() > 200 ? journal.content.substring(0, 200) + '...' : journal.content}">
+                   Journal content preview...
+                </p>
+
+                <div class="action-buttons">
+                    <a th:href="@{/admin/journal/{id}(id=${journal.id})}" class="btn btn-secondary">
+                        👁️ View
+                    </a>
+                    
+                    <a th:href="@{/admin/journal/{id}/edit(id=${journal.id})}" class="btn btn-primary">
+                        ✏️ Edit
+                    </a>
+                    
+                    <form method="POST" th:action="@{/admin/journal/{id}/delete(id=${journal.id})}" style="display: inline;">
+                        <button type="submit" class="btn btn-danger" 
+                                onclick="return confirm('Are you sure you want to delete this journal entry?')">
+                            🗑️ Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- No Data Message -->
+        <div th:unless="${journals != null and journals.size() > 0}" class="no-data">
+            <h3>📭 No Journal Entries Found</h3>
+            <p>There are no journal entries in the system yet.</p>
+        </div>
+
+        <!-- Back Button -->
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="/admin/dashboard" class="btn btn-secondary">
+                ← Back to Dashboard
+            </a>
+        </div>
+    </div>
+</body>
+</html>

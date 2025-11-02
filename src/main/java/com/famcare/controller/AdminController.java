@@ -1,16 +1,17 @@
 package com.famcare.controller;
 
 import com.famcare.model.User;
+import com.famcare.model.JournalEntry;
 import com.famcare.repository.UserRepository;
+import com.famcare.repository.JournalEntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -21,7 +22,12 @@ public class AdminController {
     private UserRepository userRepository;
 
     @Autowired
+    private JournalEntryRepository journalEntryRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
+
+    // ==================== DASHBOARD ====================
 
     @GetMapping("/dashboard")
     public String adminDashboard(Model model) {
@@ -40,6 +46,8 @@ public class AdminController {
         
         return "admin/dashboard";
     }
+
+    // ==================== USER MANAGEMENT ====================
 
     @GetMapping("/users")
     public String adminUsers(Model model) {
@@ -144,5 +152,115 @@ public class AdminController {
             model.addAttribute("parents", userRepository.findByRole("PARENT"));
             return "admin/create-user";
         }
+    }
+
+    // ==================== JOURNAL MANAGEMENT ====================
+
+    @GetMapping("/journals")
+    public String viewAllJournals(Model model) {
+        try {
+            List<JournalEntry> allJournals = new java.util.ArrayList<>();
+            List<User> children = userRepository.findByRole("CHILD");
+            
+            for (User child : children) {
+                List<JournalEntry> childJournals = journalEntryRepository.findByUserId(child.getId());
+                // Add user info to each journal
+                childJournals.forEach(j -> j.setUser(child));
+                allJournals.addAll(childJournals);
+            }
+            
+            allJournals.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
+            
+            model.addAttribute("journals", allJournals);
+            model.addAttribute("totalJournals", allJournals.size());
+            
+        } catch (Exception e) {
+            model.addAttribute("error", "Error loading journals: " + e.getMessage());
+        }
+        
+        return "admin/journals";
+    }
+
+    @GetMapping("/journal/{journalId}")
+    public String viewJournalDetails(@PathVariable Integer journalId, Model model) {
+        try {
+            JournalEntry journal = journalEntryRepository.findById(journalId)
+                .orElseThrow(() -> new RuntimeException("Journal not found"));
+            
+            User user = userRepository.findById(journal.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+            
+            model.addAttribute("journal", journal);
+            model.addAttribute("user", user);
+            
+        } catch (Exception e) {
+            model.addAttribute("error", "Error loading journal: " + e.getMessage());
+            return "redirect:/admin/journals";
+        }
+        
+        return "admin/journal-details";
+    }
+
+    // ==================== JOURNAL EDIT/UPDATE ====================
+
+    @GetMapping("/journal/{journalId}/edit")
+    public String showEditJournalForm(@PathVariable Integer journalId, Model model) {
+        try {
+            JournalEntry journal = journalEntryRepository.findById(journalId)
+                .orElseThrow(() -> new RuntimeException("Journal not found"));
+            
+            User user = userRepository.findById(journal.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+            
+            model.addAttribute("journal", journal);
+            model.addAttribute("user", user);
+            
+        } catch (Exception e) {
+            model.addAttribute("error", "Error loading journal: " + e.getMessage());
+            return "redirect:/admin/journals";
+        }
+        
+        return "admin/edit-journal";
+    }
+
+    @PostMapping("/journal/{journalId}/update")
+    public String updateJournal(
+            @PathVariable Integer journalId,
+            @RequestParam String title,
+            @RequestParam String content,
+            @RequestParam(required = false) Boolean isPrivate,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            JournalEntry journal = journalEntryRepository.findById(journalId)
+                .orElseThrow(() -> new RuntimeException("Journal not found"));
+            
+            // Update journal details
+            journal.setTitle(title);
+            journal.setContent(content);
+            journal.setIsPrivate(isPrivate != null ? isPrivate : false);
+            journal.setUpdatedAt(LocalDateTime.now());
+            
+            journalEntryRepository.save(journal);
+            
+            redirectAttributes.addFlashAttribute("success", "Journal updated successfully!");
+            return "redirect:/admin/journal/" + journalId;
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error updating journal: " + e.getMessage());
+            return "redirect:/admin/journals";
+        }
+    }
+
+    @PostMapping("/journal/{journalId}/delete")
+    public String deleteJournal(@PathVariable Integer journalId, RedirectAttributes redirectAttributes) {
+        try {
+            journalEntryRepository.deleteById(journalId);
+            redirectAttributes.addFlashAttribute("success", "Journal deleted successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error deleting journal: " + e.getMessage());
+        }
+        
+        return "redirect:/admin/journals";
     }
 }

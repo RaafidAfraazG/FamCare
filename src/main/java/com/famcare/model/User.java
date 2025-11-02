@@ -11,6 +11,10 @@ public class User {
     private String fullName;
     private Integer parentId; // For child users only
     private LocalDateTime createdAt;
+    
+    // ⭐ Added fields for reset token
+    private String resetToken; 
+    private LocalDateTime resetTokenExpiry; 
 
     // Constructors
     public User() {
@@ -92,6 +96,26 @@ public class User {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    // ⭐ Implemented Getters and Setters for Reset Token
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    // This method was duplicated and unimplemented, now it's correctly setting the field.
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public LocalDateTime getResetTokenExpiry() {
+        return resetTokenExpiry;
+    }
+
+    // This method was meant to set the expiry time, now it's correctly setting the field.
+    public void setResetTokenExpiry(LocalDateTime resetTokenExpiry) {
+        this.resetTokenExpiry = resetTokenExpiry;
     }
 
     @Override

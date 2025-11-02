@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journal Details - FamCare Admin</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .detail-card {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+        
+        .detail-header {
+            border-bottom: 3px solid #f0f0f0;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .detail-header h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .meta-info {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .badge-private {
+            background: #ffe0e0;
+            color: #c33;
+        }
+        
+        .badge-shared {
+            background: #e0f0ff;
+            color: #0066cc;
+        }
+        
+        .content-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+            line-height: 1.8;
+            color: #333;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏥 FamCare Admin</h1>
+            <div class="nav-links">
+                <a href="/admin/dashboard">Dashboard</a>
+                <a href="/admin/journals">Journals</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="detail-card">
+        <!-- Success/Error Messages -->
+        <div th:if="${success}" class="alert alert-success">
+            <p th:text="${success}"></p>
+        </div>
+        
+        <div th:if="${error}" class="alert alert-error">
+            <p th:text="${error}"></p>
+        </div>
+
+        <!-- Journal Details -->
+        <div class="detail-header">
+            <h2 th:text="${journal.title}">Journal Title</h2>
+            
+            <div class="meta-info">
+                <div class="meta-item">
+                    <span>👤</span>
+                    <strong>Author:</strong>
+                    <span th:text="${user.fullName}"></span>
+                </div>
+                
+                <div class="meta-item">
+                    <span>📅</span>
+                    <strong>Created:</strong>
+                    <span th:text="${#temporals.format(journal.createdAt, 'MMM dd, yyyy HH:mm')}"></span>
+                </div>
+                
+                <div class="meta-item" th:if="${journal.updatedAt != null}">
+                    <span>🔄</span>
+                    <strong>Updated:</strong>
+                    <span th:text="${#temporals.format(journal.updatedAt, 'MMM dd, yyyy HH:mm')}"></span>
+                </div>
+                
+                <div class="meta-item">
+                    <span th:if="${journal.isPrivate}" class="badge badge-private">🔒 Private</span>
+                    <span th:unless="${journal.isPrivate}" class="badge badge-shared">👁️ Shared</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content-section">
+            <p th:text="${journal.content}">Journal content goes here...</p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <a th:href="@{/admin/journal/{id}/edit(id=${journal.id})}" class="btn btn-primary">
+                ✏️ Edit Journal
+            </a>
+            
+            <form method="POST" th:action="@{/admin/journal/{id}/delete(id=${journal.id})}" style="display: inline;">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this journal entry? This action cannot be undone.')">
+                    🗑️ Delete
+                </button>
+            </form>
+            
+            <a href="/admin/journals" class="btn btn-secondary">
+                ← Back to Journals
+            </a>
+        </div>
+    </div>
+</body>
+</html>
