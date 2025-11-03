@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Family Chat - FamCare</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
     <style>
         * {
             margin: 0;
@@ -90,6 +89,32 @@
                 transform: translate(-25px, 25px) scale(0.92);
                 opacity: 0.12;
             }
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(99, 102, 241, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.025) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: grid-move 20s linear infinite;
+            transition: background-image 0.3s ease;
+        }
+
+        body.dark-theme .bg-animation::before {
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        }
+
+        @keyframes grid-move {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
         }
 
         .chat-container {
@@ -283,6 +308,9 @@
             cursor: pointer;
             transition: all 0.3s ease;
             border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         body.dark-theme .family-member {
@@ -297,6 +325,22 @@
 
         body.dark-theme .family-member:hover {
             background: rgba(99, 102, 241, 0.12);
+        }
+
+        .member-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            color: white;
+        }
+
+        .member-info {
+            flex: 1;
         }
 
         .family-member strong {
@@ -320,6 +364,25 @@
 
         body.dark-theme .member-role {
             color: #cbd5e1;
+        }
+
+        .member-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-left: auto;
+        }
+
+        .status-online {
+            background-color: #10b981;
+        }
+
+        .status-offline {
+            background-color: #94a3b8;
+        }
+
+        .status-away {
+            background-color: #f59e0b;
         }
 
         /* Chat Content */
@@ -515,37 +578,85 @@
             background: rgba(255, 255, 255, 0.02);
         }
 
-        .emoji-reactions {
-            display: flex;
-            gap: 6px;
-            padding-right: 12px;
-            border-right: 1px solid rgba(0, 0, 0, 0.08);
+        .emoji-picker-container {
+            position: relative;
         }
 
-        body.dark-theme .emoji-reactions {
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .emoji-btn {
-            font-size: 22px;
+        .emoji-picker-btn {
             background: rgba(99, 102, 241, 0.05);
-            border: none;
-            cursor: pointer;
-            padding: 6px;
-            transition: all 0.3s ease;
+            border: 1.5px solid rgba(99, 102, 241, 0.1);
+            color: #6366f1;
+            padding: 10px 12px;
             border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
         }
 
-        body.dark-theme .emoji-btn {
+        body.dark-theme .emoji-picker-btn {
             background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #a5b4fc;
         }
 
-        .emoji-btn:hover {
+        .emoji-picker-btn:hover {
             background: rgba(99, 102, 241, 0.12);
-            transform: scale(1.15);
+            transform: translateY(-2px);
         }
 
-        body.dark-theme .emoji-btn:hover {
+        body.dark-theme .emoji-picker-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .emoji-picker {
+            position: absolute;
+            bottom: 50px;
+            left: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 12px;
+            display: none;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+            width: 240px;
+            z-index: 1000;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-theme .emoji-picker {
+            background: #1e2034;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .emoji-picker.active {
+            display: grid;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .emoji-option {
+            font-size: 20px;
+            padding: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .emoji-option:hover {
+            background: rgba(99, 102, 241, 0.1);
+            transform: scale(1.2);
+        }
+
+        body.dark-theme .emoji-option:hover {
             background: rgba(255, 255, 255, 0.1);
         }
 
@@ -809,8 +920,9 @@
                 padding: 0 20px;
             }
 
-            .emoji-reactions {
-                display: none;
+            .emoji-picker {
+                width: 200px;
+                grid-template-columns: repeat(5, 1fr);
             }
 
             .send-btn {
@@ -827,7 +939,7 @@
         <div class="gradient-orb orb3"></div>
     </div>
 
-    <div class="chat-container" th:data-user-id="${loggedInUserId}">
+    <div class="chat-container" data-user-id="user1">
         <!-- Header -->
         <div class="chat-header">
             <div class="header-container">
@@ -839,8 +951,7 @@
                 <div class="header-center">
                     <h2>👨‍👩‍👧‍👦 Family Chat</h2>
                     <div class="family-members-info">
-                        <span th:if="${familyMembers != null}" th:text="'Connected with ' + ${familyMembers.size()} + ' family members'"></span>
-                        <span th:unless="${familyMembers != null}">Loading family members...</span>
+                        Connected with 4 family members
                     </div>
                 </div>
                 <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">
@@ -855,17 +966,45 @@
             <div class="chat-sidebar">
                 <div class="sidebar-title">Family Members</div>
                 <div class="family-members-list">
-                    <div th:if="${familyMembers != null and familyMembers.size() > 0}">
-                        <div th:each="member : ${familyMembers}" class="family-member">
-                            <div>
-                                <strong th:text="${member.getFullName()}"></strong>
-                                <span th:if="${member.getId() == loggedInUserId}" style="color: #6366f1; margin-left: 5px; font-size: 12px;">(You)</span>
-                            </div>
-                            <div class="member-role" th:text="${member.getRole()}"></div>
+                    <div class="family-member">
+                        <div class="member-avatar" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
+                            JS
                         </div>
+                        <div class="member-info">
+                            <strong>John Smith</strong>
+                            <div class="member-role">Parent</div>
+                        </div>
+                        <div class="member-status status-online"></div>
                     </div>
-                    <div th:unless="${familyMembers != null and familyMembers.size() > 0}" style="padding: 20px; text-align: center; color: #94a3b8;">
-                        <p>No family members found</p>
+                    <div class="family-member">
+                        <div class="member-avatar" style="background: linear-gradient(135deg, #ec4899 0%, #f97316 100%);">
+                            MS
+                        </div>
+                        <div class="member-info">
+                            <strong>Mary Smith</strong>
+                            <div class="member-role">Parent</div>
+                        </div>
+                        <div class="member-status status-online"></div>
+                    </div>
+                    <div class="family-member">
+                        <div class="member-avatar" style="background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);">
+                            ES
+                        </div>
+                        <div class="member-info">
+                            <strong>Emma Smith</strong>
+                            <div class="member-role">Teen</div>
+                        </div>
+                        <div class="member-status status-away"></div>
+                    </div>
+                    <div class="family-member">
+                        <div class="member-avatar" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                            LS
+                        </div>
+                        <div class="member-info">
+                            <strong>Liam Smith</strong>
+                            <div class="member-role">Child</div>
+                        </div>
+                        <div class="member-status status-offline"></div>
                     </div>
                 </div>
             </div>
@@ -886,12 +1025,32 @@
 
                 <!-- Message Input -->
                 <div class="input-area">
-                    <div class="emoji-reactions">
-                        <button class="emoji-btn" title="Happy" onclick="insertEmoji('😊')">😊</button>
-                        <button class="emoji-btn" title="Love" onclick="insertEmoji('❤️')">❤️</button>
-                        <button class="emoji-btn" title="Thumbs Up" onclick="insertEmoji('👍')">👍</button>
-                        <button class="emoji-btn" title="Sad" onclick="insertEmoji('😢')">😢</button>
-                        <button class="emoji-btn" title="Laugh" onclick="insertEmoji('😂')">😂</button>
+                    <div class="emoji-picker-container">
+                        <button class="emoji-picker-btn" id="emojiPickerBtn">
+                            😊
+                        </button>
+                        <div class="emoji-picker" id="emojiPicker">
+                            <div class="emoji-option" onclick="insertEmoji('😊')">😊</div>
+                            <div class="emoji-option" onclick="insertEmoji('😂')">😂</div>
+                            <div class="emoji-option" onclick="insertEmoji('🥰')">🥰</div>
+                            <div class="emoji-option" onclick="insertEmoji('😎')">😎</div>
+                            <div class="emoji-option" onclick="insertEmoji('🤔')">🤔</div>
+                            <div class="emoji-option" onclick="insertEmoji('😢')">😢</div>
+                            <div class="emoji-option" onclick="insertEmoji('❤️')">❤️</div>
+                            <div class="emoji-option" onclick="insertEmoji('👍')">👍</div>
+                            <div class="emoji-option" onclick="insertEmoji('👏')">👏</div>
+                            <div class="emoji-option" onclick="insertEmoji('🎉')">🎉</div>
+                            <div class="emoji-option" onclick="insertEmoji('🙏')">🙏</div>
+                            <div class="emoji-option" onclick="insertEmoji('🤗')">🤗</div>
+                            <div class="emoji-option" onclick="insertEmoji('😴')">😴</div>
+                            <div class="emoji-option" onclick="insertEmoji('😍')">😍</div>
+                            <div class="emoji-option" onclick="insertEmoji('🤩')">🤩</div>
+                            <div class="emoji-option" onclick="insertEmoji('😇')">😇</div>
+                            <div class="emoji-option" onclick="insertEmoji('🙈')">🙈</div>
+                            <div class="emoji-option" onclick="insertEmoji('🔥')">🔥</div>
+                            <div class="emoji-option" onclick="insertEmoji('⭐')">⭐</div>
+                            <div class="emoji-option" onclick="insertEmoji('🌈')">🌈</div>
+                        </div>
                     </div>
                     <textarea class="message-input" id="messageInput" placeholder="Type your message here..." rows="1"></textarea>
                     <button class="send-btn" id="sendBtn">Send</button>
@@ -911,3 +1070,206 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Theme toggle functionality
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+            document.getElementById('themeIcon').textContent = '☀️';
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            
+            body.classList.toggle('dark-theme');
+            
+            if (body.classList.contains('dark-theme')) {
+                themeIcon.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeIcon.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Emoji picker functionality
+        const emojiPickerBtn = document.getElementById('emojiPickerBtn');
+        const emojiPicker = document.getElementById('emojiPicker');
+
+        emojiPickerBtn.addEventListener('click', function() {
+            emojiPicker.classList.toggle('active');
+        });
+
+        // Close emoji picker when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!emojiPickerBtn.contains(e.target) && !emojiPicker.contains(e.target)) {
+                emojiPicker.classList.remove('active');
+            }
+        });
+
+        // Emoji insertion function
+        function insertEmoji(emoji) {
+            const messageInput = document.getElementById('messageInput');
+            const cursorPosition = messageInput.selectionStart;
+            const textBefore = messageInput.value.substring(0, cursorPosition);
+            const textAfter = messageInput.value.substring(cursorPosition);
+            
+            messageInput.value = textBefore + emoji + textAfter;
+            messageInput.focus();
+            messageInput.selectionStart = cursorPosition + emoji.length;
+            messageInput.selectionEnd = cursorPosition + emoji.length;
+            
+            // Close emoji picker after selection
+            emojiPicker.classList.remove('active');
+        }
+
+        // Auto-resize textarea
+        const messageInput = document.getElementById('messageInput');
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Send message functionality
+        const sendBtn = document.getElementById('sendBtn');
+        sendBtn.addEventListener('click', function() {
+            const message = messageInput.value.trim();
+            if (message) {
+                sendMessage(message);
+                messageInput.value = '';
+                messageInput.style.height = 'auto';
+            }
+        });
+
+        // Send message on Enter key (but allow Shift+Enter for new line)
+        messageInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendBtn.click();
+            }
+        });
+
+        // Mock function to simulate sending a message
+        function sendMessage(message) {
+            // In a real application, this would send the message to your backend
+            console.log('Sending message:', message);
+            
+            // For demo purposes, we'll just add it to the chat
+            addMessageToChat({
+                id: Date.now(),
+                content: message,
+                senderId: document.querySelector('.chat-container').dataset.userId,
+                senderName: 'You',
+                timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                isOwn: true
+            });
+        }
+
+        // Function to add a message to the chat
+        function addMessageToChat(message) {
+            const messagesContainer = document.getElementById('messagesContainer');
+            const emptyState = document.getElementById('emptyState');
+            
+            // Hide empty state if it's the first message
+            if (emptyState) {
+                emptyState.style.display = 'none';
+            }
+            
+            // Create message element
+            const messageElement = document.createElement('div');
+            messageElement.className = `message message-${message.isOwn ? 'own' : 'other'}`;
+            messageElement.setAttribute('data-message-id', message.id);
+            
+            messageElement.innerHTML = `
+                <div class="message-content">
+                    <div class="message-sender">${message.senderName}</div>
+                    <div class="message-bubble">${message.content}</div>
+                    <div class="message-time">${message.timestamp}</div>
+                    ${message.isOwn ? '<button class="message-delete-btn" onclick="showDeleteModal(' + message.id + ')">Delete</button>' : ''}
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Update message count
+            updateMessageCount();
+        }
+
+        // Function to update message count
+        function updateMessageCount() {
+            const messageCount = document.getElementById('messageCount');
+            const messages = document.querySelectorAll('.message');
+            messageCount.textContent = `${messages.length} messages`;
+        }
+
+        // Delete message functionality
+        let messageToDelete = null;
+
+        function showDeleteModal(messageId) {
+            messageToDelete = messageId;
+            document.getElementById('confirmModal').classList.add('active');
+        }
+
+        function hideDeleteModal() {
+            document.getElementById('confirmModal').classList.remove('active');
+            messageToDelete = null;
+        }
+
+        function deleteMessage() {
+            if (messageToDelete) {
+                // In a real application, this would send a delete request to your backend
+                console.log('Deleting message:', messageToDelete);
+                
+                // For demo purposes, we'll just remove it from the DOM
+                const messageElement = document.querySelector(`[data-message-id="${messageToDelete}"]`);
+                if (messageElement) {
+                    messageElement.remove();
+                    updateMessageCount();
+                }
+                
+                hideDeleteModal();
+            }
+        }
+
+        // Event listeners for modal
+        document.getElementById('confirmCancel').addEventListener('click', hideDeleteModal);
+        document.getElementById('confirmDelete').addEventListener('click', deleteMessage);
+
+        // Close modal when clicking outside
+        document.getElementById('confirmModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideDeleteModal();
+            }
+        });
+
+        // Show error message function
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+            }, 5000);
+        }
+
+        // Initialize with some demo messages
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add a welcome message after a short delay
+            setTimeout(() => {
+                addMessageToChat({
+                    id: 1,
+                    content: 'Welcome to the family chat! 👋',
+                    senderId: 'system',
+                    senderName: 'System',
+                    timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                    isOwn: false
+                });
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
