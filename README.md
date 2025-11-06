@@ -55,7 +55,7 @@ logging.level.com.famcare=DEBUG
 
 Clone this repository:
 
-git clone https://github.com/YOUR-USERNAME/FamCare.git
+git clone https://github.com/RaafidAfraazG/FamCare.git
 cd FamCare
 
 
