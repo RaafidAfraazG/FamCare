@@ -1,85 +1,167 @@
-🩺 FamCare: Family Mental Health Tracker
+# 🏥 FamCare
 
-FamCare is a web application designed to help families track emotional well-being, stress levels, and overall mental health. The system allows family members to record daily moods, view analytics, and receive early insights for emotional support — all within a secure, privacy-first environment.
+**FamCare** is a family mental health and wellness web application built with Spring Boot. It enables families to monitor children's emotional well-being through mood tracking, journaling, AI-powered sentiment analysis, family chat, and doctor coordination — all in one platform.
 
-🌟 Features
+---
 
-Role-Based Access
-Different views and permissions for parents, children, and therapists.
+## ✨ Features
 
-Mood & Journal Tracking
-Each family member can log daily moods or write short emotional entries.
+### 👦 Child Dashboard
+- **Mood Logging** — Log daily moods with context and notes
+- **Mood History** — View personal mood trends over time
+- **Journal** — Create, view, and edit private journal entries
+- **Doctor Access** — View assigned family doctors and contact info
 
-Analytics Dashboard
-Visual representation of mood trends and family-wide emotional patterns.
+### 👨‍👩‍👧 Parent Dashboard
+- **Child Analytics** — Visualize children's mood trends with charts
+- **Mood Chart** — Interactive mood data visualizations
+- **Doctor Management** — Manage the family's doctor relationships
+- **Intervention Alerts** — Receive alerts when a child may need support
 
-Privacy-Focused
-All entries are stored securely with user authentication and access control.
+### 👨‍👩‍👧‍👦 Family Dashboard
+- **Family Insights** — AI-generated insights about overall family well-being
+- **Child Insights** — Per-child emotional trend analysis
+- **Alerts** — View intervention alerts flagged by the system
+- **Family Chat** — Real-time family messaging
 
-Suggestions & Insights
-Automated insights for family intervention and well-being improvement.
+### 🩺 Doctor Portal
+- Accessible by assigned family doctors to review relevant family data
 
-🏗️ Tech Stack
-Category	Technology
-Backend	Spring Boot
-Frontend	Thymeleaf (HTML/CSS/JS)
-Database	PostgreSQL
-APIs	RESTful APIs
-Build Tool	Maven
-⚙️ Configuration
+### 🛡️ Admin Panel
+- Create and manage users (children, parents, family accounts)
+- View and manage all registered users
 
-In your application.properties file:
+### 🤖 AI-Powered Services
+- **Sentiment Analysis** — Analyzes journal entries and chat messages to detect emotional patterns
+- **Intervention Alerts** — Automatically flags concerning sentiment trends
+- **Family Insights** — Generates contextual insights from family data
 
-# Server Port
-server.port=8080
+---
 
-# PostgreSQL Database Configuration
-spring.datasource.url=jdbc:postgresql://localhost:5433/famcare_db
-spring.datasource.username=postgres
-spring.datasource.password=postgres123
-spring.datasource.driver-class-name=org.postgresql.Driver
+## 🛠️ Tech Stack
 
-# JPA/Hibernate (disabled - using JDBC)
-spring.jpa.hibernate.ddl-auto=none
+| Layer | Technology |
+|---|---|
+| **Backend** | Java, Spring Boot |
+| **Frontend** | Thymeleaf, HTML/CSS |
+| **Security** | Spring Security |
+| **Database** | JPA/Hibernate (configurable) |
+| **Build Tool** | Maven |
+| **AI/NLP** | Custom Sentiment Analysis Service |
 
-# Thymeleaf Configuration
-spring.thymeleaf.cache=false
-spring.thymeleaf.prefix=classpath:/templates/
-spring.thymeleaf.suffix=.html
+---
 
-# Logging
-logging.level.root=INFO
-logging.level.com.famcare=DEBUG
+## 📁 Project Structure
 
-🚀 Running the Application
+```
+src/
+├── main/
+│   ├── java/com/famcare/
+│   │   ├── controller/       # MVC Controllers (Admin, Auth, Child, Parent, Family, Chat, Doctor)
+│   │   ├── model/            # Domain models (User, MoodEntry, JournalEntry, ChatMessage, etc.)
+│   │   ├── repository/       # Spring Data JPA Repositories
+│   │   ├── service/          # Business logic (Mood, Journal, Chat, Insights, Sentiment, Intervention)
+│   │   ├── config/           # Security configuration
+│   │   └── util/             # Utilities (PasswordEncoder)
+│   └── resources/
+│       ├── templates/        # Thymeleaf HTML templates
+│       ├── static/css/       # Stylesheets
+│       └── application.properties
+```
 
-Clone this repository:
+---
 
-git clone https://github.com/RaafidAfraazG/FamCare.git
-cd FamCare
+## 🚀 Getting Started
 
+### Prerequisites
 
-Ensure PostgreSQL is running and configured as per your application.properties.
+- **Java 17+**
+- **Maven 3.8+**
+- A relational database (MySQL, PostgreSQL, or H2 for development)
 
-Build and run the project:
+### Installation
 
-mvn spring-boot:run
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/RaafidAfraazG/famcare.git
+   cd famcare
+   ```
 
+2. **Configure the database**
 
-Visit the app at:
-http://localhost:8080
+   Edit `src/main/resources/application.properties`:
+   ```properties
+   spring.datasource.url=jdbc:mysql://localhost:3306/famcare
+   spring.datasource.username=your_username
+   spring.datasource.password=your_password
+   spring.jpa.hibernate.ddl-auto=update
+   ```
 
-📊 Future Enhancements
+3. **Build the project**
+   ```bash
+   mvn clean install
+   ```
 
-AI-based mood prediction and alerts
+4. **Run the application**
+   ```bash
+   mvn spring-boot:run
+   ```
 
-Mobile-friendly responsive design
+5. **Access the app**
 
-Integration with wearable devices
+   Open your browser and navigate to: `http://localhost:8080`
 
-Family counseling recommendations
+---
 
-📄 License
+## 👥 User Roles
 
-This project is open source and available under the MIT License
-.
+| Role | Description |
+|---|---|
+| `ADMIN` | Full system access; can create and manage all users |
+| `PARENT` | Views child analytics, manages doctors, receives alerts |
+| `CHILD` | Logs moods, writes journal entries, views own history |
+| `FAMILY` | Accesses family-wide insights, chat, and alerts |
+| `DOCTOR` | Views assigned family health data |
+
+---
+
+## 🔐 Security
+
+- Spring Security handles authentication and role-based access control
+- Passwords are encoded using a custom `PasswordEncoder` utility
+- Each role has restricted access to its own set of routes and dashboards
+
+---
+
+## 📊 Key Models
+
+- **User** — Core user entity with role assignment
+- **MoodEntry** — Daily mood logs with timestamp and notes
+- **JournalEntry** — Private journal entries per child
+- **ChatMessage** — Family chat messages
+- **FamilyDoctor** — Doctor-family relationship records
+- **FamilyInsight** — AI-generated family wellness insights
+- **InterventionAlert** — System-generated alerts for at-risk indicators
+- **MoodTrend** — Aggregated mood trend data for analytics
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit your changes: `git commit -m "Add your feature"`
+4. Push to the branch: `git push origin feature/your-feature`
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+## 📬 Contact
+
+For questions or support, please open an issue in the repository or contact the project maintainers.
